@@ -28,8 +28,8 @@
 
     <TextView
         android:id="@+id/labelUsuari"
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
         android:text="@string/usuari"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
@@ -57,7 +57,7 @@
 
     <TextView
         android:id="@+id/labelContrasenya"
-        android:layout_width="wrap_content"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:text="@string/contrasenya"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
