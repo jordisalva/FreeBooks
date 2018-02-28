@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //hola
-
     // Variables dels botons
     Button botoInici, botoAlta;
 
