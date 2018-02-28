@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">FreeBooks</string>
+    <string name="titol">FreeBooks</string>
+    <string name="usuari">Usuari: </string>
+    <string name="contrasenya">Contrasenya: </string>
+    <string name="inici_sessio">Inicia sessió</string>
+    <string name="nou_usuari">Nou usuari</string>
+    <string name="introdueix_usuari">Introdueix l\'usuari...</string>
+    <string name="introdueix_contrasenya">Introdueix la contrasenya...</string>
+    <string name="logout">Logout</string>
+</resources>
