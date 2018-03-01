@@ -1,5 +1,6 @@
 package ioc.xtec.cat.freebooks;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -31,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         // Definim els listeners
-        botoInici = ((Button)findViewById(R.id.buttonInici));
+        botoInici = ((Button)findViewById(R.id.buttonCancelar));
         botoInici.setOnClickListener(this);
-        botoAlta = ((Button)findViewById(R.id.buttonAlta));
+        botoAlta = ((Button)findViewById(R.id.buttonDonarAlta));
         botoAlta.setOnClickListener(this);
 
         textUsuari = ((TextView)findViewById(R.id.textUsuari));
@@ -96,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "Username Or Password Are Valid", Toast.LENGTH_SHORT).show();
             }
 
+        } else if (v == botoAlta) {
+            Intent i = new Intent(this, AltaUsuariActivity.class);
+            startActivity(i);
         }
 
     }
