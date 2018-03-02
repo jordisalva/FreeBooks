@@ -92,9 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             thread.start();
             if(codiSessio.equals("FAIL")){
-                Toast.makeText(this, "Username Or Password Are Invalid", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Usuari o contrasenya invàlids", Toast.LENGTH_SHORT).show();
+            }else if (codiSessio.equals("OK")){
+                Toast.makeText(this, "Usuari vàlid", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, PrincipalActivity.class);
+                startActivity(i);
             }else{
-                Toast.makeText(this, "Username Or Password Are Valid", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "El servidor no respon", Toast.LENGTH_SHORT).show();
             }
 
         } else if (v == botoAlta) {
