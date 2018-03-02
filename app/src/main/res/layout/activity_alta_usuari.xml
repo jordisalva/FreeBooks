@@ -121,7 +121,7 @@
         android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="@string/introdueix_confirma_contrasenya"
-        android:inputType="textPersonName"
+        android:inputType="textPassword"
         android:labelFor="@+id/labelMail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/labelConfirmaContrasenya"
