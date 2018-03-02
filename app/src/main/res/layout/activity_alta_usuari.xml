@@ -41,7 +41,7 @@
         android:id="@+id/textUsuari"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="@string/introdueix_usuari"
         android:inputType="textPersonName"
@@ -70,7 +70,7 @@
         android:id="@+id/textContrasenya"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="@string/introdueix_contrasenya"
         android:inputType="textPassword"
@@ -80,10 +80,10 @@
         app:layout_constraintTop_toTopOf="@+id/textUsuari"></EditText>
 
     <TextView
-        android:id="@+id/labelMail"
+        android:id="@+id/labelConfirmaContrasenya"
         android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:text="@string/mail"
+        android:text="@string/confirma_contrasenya"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textMail"
@@ -91,16 +91,40 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/textMail"
+        android:id="@+id/textConfirmaContrasenya"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="76dp"
         android:ems="10"
         android:hint="@string/introdueix_mail"
         android:inputType="textPersonName"
-        android:labelFor="@+id/labelMail"
+        android:labelFor="@+id/labelConfirmaMail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/labelMail"
+        app:layout_constraintTop_toTopOf="@+id/textMail"></EditText>
+
+    <TextView
+        android:id="@+id/labelMail"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:text="@string/mail"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textConfirmaContrasenya"
+        app:layout_constraintEnd_toStartOf="@+id/textMail"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/textMail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:ems="10"
+        android:hint="@string/introdueix_confirma_contrasenya"
+        android:inputType="textPersonName"
+        android:labelFor="@+id/labelMail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/labelConfirmaContrasenya"
         app:layout_constraintTop_toTopOf="@+id/textContrasenya"></EditText>
 
     <Button
@@ -108,7 +132,7 @@
         style="@android:style/Widget.DeviceDefault.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="188dp"
         android:text="@string/boto_alta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonCancelar"
