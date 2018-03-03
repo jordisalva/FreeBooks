@@ -43,6 +43,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void showToast(final String toast)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -77,6 +87,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 try (BufferedReader lector = new BufferedReader(
                                         new InputStreamReader(socket.getInputStream()))) {
                                     codiSessio = lector.readLine();
+                                    if(codiSessio.equals("FAIL")){
+                                        showToast("Usuari o contrasenya invàlids");
+                                        //Toast.makeText(this, "Usuari o contrasenya invàlids", Toast.LENGTH_SHORT).show();
+                                    }else if (codiSessio.contains("OK")){
+                                        showToast("Usuari o contrasenya vàlids");
+                                        //Toast.makeText(this, "Usuari vàlid", Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
+                                        startActivity(i);
+                                    }else{
+                                        showToast("El servidor no respon");
+                                        //Toast.makeText(this, "El servidor no respon", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
                             }
@@ -91,15 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
 
             thread.start();
-            if(codiSessio.equals("FAIL")){
-                Toast.makeText(this, "Usuari o contrasenya invàlids", Toast.LENGTH_SHORT).show();
-            }else if (codiSessio.equals("OK")){
-                Toast.makeText(this, "Usuari vàlid", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(this, PrincipalActivity.class);
-                startActivity(i);
-            }else{
-                Toast.makeText(this, "El servidor no respon", Toast.LENGTH_SHORT).show();
-            }
+
 
         } else if (v == botoAlta) {
             Intent i = new Intent(this, AltaUsuariActivity.class);
