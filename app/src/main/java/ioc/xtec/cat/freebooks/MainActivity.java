@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     if(codiSessio.equals("FAIL")){
                                         showToast("Usuari o contrasenya invàlids");
                                         //Toast.makeText(this, "Usuari o contrasenya invàlids", Toast.LENGTH_SHORT).show();
-                                    }else if (codiSessio.contains("OK")){
+                                    }else if (codiSessio.startsWith("OK")){
                                         showToast("Usuari o contrasenya vàlids");
                                         //Toast.makeText(this, "Usuari vàlid", Toast.LENGTH_SHORT).show();
                                         Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
