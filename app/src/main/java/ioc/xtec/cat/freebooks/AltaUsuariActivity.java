@@ -8,18 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-
 public class AltaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Variables dels botons
     Button botoAltaUsuari, botoCancelar;
     //Variables pels editText
-    EditText userText,userPass,userEmail;
+    EditText userText,userPass,userConfirmPass,userEmail;
     private String resposta = "";
 
     @Override
@@ -29,6 +23,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
 
         userText = (EditText)findViewById(R.id.textUsuari);
         userPass = (EditText)findViewById(R.id.textContrasenya);
+        userConfirmPass = (EditText)findViewById(R.id.textConfirmaContrasenya);
         userEmail = (EditText)findViewById(R.id.textMail);
         // Definim els listeners
         botoAltaUsuari = ((Button)findViewById(R.id.buttonDonarAlta));
@@ -49,46 +44,47 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        // Obté les dades de login introduïdes per l'usuari
+        String usuariIntroduit = userText.getText().toString();
+        String passIntroduit = userPass.getText().toString();
+        String passConfirmacioIntroduit = userConfirmPass.getText().toString();
+        String emailIntroduit = userEmail.getText().toString();
+
+        final Intent i = new Intent(this, MainActivity.class);
+
+
         if (v == botoAltaUsuari) {
-            final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
-            Thread thread = new Thread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try  {
-                        try{
-                            Socket socket = new Socket("192.168.0.157", 9999);
-                            try(BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))){
-                                escriptor.write(codiRequest);
-                                escriptor.newLine();
-                                escriptor.flush();
-                                //Obté el resultat del server
-                                try (BufferedReader lector = new BufferedReader(
-                                        new InputStreamReader(socket.getInputStream()))) {
-                                    resposta = lector.readLine();
-                                    if(resposta.equals("OK")){
-                                        showToast("User created");
-                                    }else{
-                                        showToast("User already exists");
-                                    }
+            if(usuariIntroduit.equals("")||passIntroduit.equals("")||passConfirmacioIntroduit.equals("")||emailIntroduit.equals("")) {
+                showToast("Falten dades");
+            } else {
+                if(!passIntroduit.equals(passConfirmacioIntroduit)) {
+                    showToast("Contrasenya diferent");
+                } else{
+                    final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try  {
+                                ConnexioServidor connexioServidor = new ConnexioServidor();
+                                resposta = connexioServidor.consulta(codiRequest);
+                                if(resposta.equals("OK")){
+                                    showToast("Usuari Creat");
+                                    startActivity(i);
+                                }else{
+                                    showToast("L'usuari ja existeix");
                                 }
-
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                            socket.close();
-                        } catch (Exception e){
-                            System.out.println(e.getMessage());
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    });
+                    thread.start();
                 }
-            });
-            thread.start();
-
+            }
         } else {
-            Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
-
         }
     }
 }

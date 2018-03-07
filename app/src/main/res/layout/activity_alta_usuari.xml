@@ -12,12 +12,22 @@
     android:weightSum="1">
 
 
+    <ImageView
+        android:id="@+id/imageAddUser"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="276dp"
+        android:contentDescription="@string/imageAddUser"
+        android:src="@drawable/adduser"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/titol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="104dp"
         android:text="@string/titol_alta"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="36sp"
@@ -86,12 +96,12 @@
         android:text="@string/confirma_contrasenya"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textMail"
-        app:layout_constraintEnd_toStartOf="@+id/textMail"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textConfirmaContrasenya"
+        app:layout_constraintEnd_toStartOf="@+id/textConfirmaContrasenya"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/textConfirmaContrasenya"
+        android:id="@+id/textMail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
@@ -101,7 +111,7 @@
         android:labelFor="@+id/labelConfirmaMail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/labelMail"
-        app:layout_constraintTop_toTopOf="@+id/textMail"></EditText>
+        app:layout_constraintTop_toTopOf="@+id/textConfirmaContrasenya"></EditText>
 
     <TextView
         android:id="@+id/labelMail"
@@ -110,12 +120,12 @@
         android:text="@string/mail"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textConfirmaContrasenya"
-        app:layout_constraintEnd_toStartOf="@+id/textMail"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textMail"
+        app:layout_constraintEnd_toStartOf="@+id/textConfirmaContrasenya"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/textMail"
+        android:id="@+id/textConfirmaContrasenya"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="68dp"

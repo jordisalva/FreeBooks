@@ -15,4 +15,6 @@
     <string name="titol_alta">Alta d\'usuari</string>
     <string name="boto_alta">Donar d\'alta</string>
     <string name="boto_cancelar">Cancel·lar</string>
+    <string name="imageLogoBooks">logoBooks</string>
+    <string name="imageAddUser">addUser</string>
 </resources>

@@ -12,12 +12,22 @@
     android:weightSum="1">
 
 
+    <ImageView
+        android:id="@+id/imageLogoBooks"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="276dp"
+        android:contentDescription="@string/imageLogoBooks"
+        android:src="@drawable/logobooks"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/titol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="124dp"
         android:text="@string/titol"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="36sp"
