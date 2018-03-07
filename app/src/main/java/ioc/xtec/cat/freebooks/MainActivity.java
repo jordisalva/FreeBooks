@@ -71,14 +71,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }*/
 
             //System.out.println(user.getText() + "\n" + pass.getText());
-            final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit;
+            final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit+"-Mobile";
             Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
                     try  {
                         try{
-                            Socket socket = new Socket("192.168.1.36", 9999);
+                            Socket socket = new Socket("192.168.0.157", 9999);
                             try(BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))){
                                 escriptor.write(codiRequest);
                                 escriptor.newLine();

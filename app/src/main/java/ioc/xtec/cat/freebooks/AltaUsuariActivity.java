@@ -19,7 +19,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
     // Variables dels botons
     Button botoAltaUsuari, botoCancelar;
     //Variables pels editText
-    EditText userText,userPass;
+    EditText userText,userPass,userEmail;
     private String resposta = "";
 
     @Override
@@ -29,6 +29,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
 
         userText = (EditText)findViewById(R.id.textUsuari);
         userPass = (EditText)findViewById(R.id.textContrasenya);
+        userEmail = (EditText)findViewById(R.id.textMail);
         // Definim els listeners
         botoAltaUsuari = ((Button)findViewById(R.id.buttonDonarAlta));
         botoAltaUsuari.setOnClickListener(this);
@@ -49,14 +50,14 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View v) {
         if (v == botoAltaUsuari) {
-            final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText();
+            final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
             Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
                     try  {
                         try{
-                            Socket socket = new Socket("192.168.1.36", 9999);
+                            Socket socket = new Socket("192.168.0.157", 9999);
                             try(BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))){
                                 escriptor.write(codiRequest);
                                 escriptor.newLine();
