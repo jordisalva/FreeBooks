@@ -24,8 +24,23 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         if (v == botoLogout) {
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
+
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    ConnexioServidor connexioServidor = new ConnexioServidor();
+                    String codiRequest = "userLogout";
+                    String resposta = connexioServidor.consulta(codiRequest);
+                    if(resposta.equals("OK")){
+                        System.out.println("Logout ok");
+                    }
+                    Intent i = new Intent(PrincipalActivity.this, MainActivity.class);
+                    startActivity(i);
+                }
+            });
+            thread.start();
+
         }
     }
 }
