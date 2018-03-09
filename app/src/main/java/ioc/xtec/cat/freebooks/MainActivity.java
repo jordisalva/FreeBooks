@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Variables dels TextViews
     TextView textUsuari, textContrasenya, missatge;
 
-    //codi per identificar la sessió
+    // Codi per identificar la sessió
     private String codiSessio = "";
 
     @Override
