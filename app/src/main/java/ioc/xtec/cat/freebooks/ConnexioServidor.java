@@ -13,6 +13,13 @@ import java.net.Socket;
 public class ConnexioServidor {
     String resposta = "";
 
+    /**
+     * Retorna la resposta del servidor, després de passar-li les dades
+     * com a paràmetre.
+     *
+     * @param dades String amb les dades que se li pasaran al servidor
+     * @return String amb la resposta del servidor
+     */
     public String consulta(String dades) {
         try{
             Socket socket = new Socket("10.0.2.2", 9999);

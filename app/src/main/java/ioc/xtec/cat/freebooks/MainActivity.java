@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     // Variables dels botons
-    Button botoInici, botoAlta;
+    Button botoInici, botoAlta, botoSortir;
 
     // Variables dels TextViews
     TextView textUsuari, textContrasenya, missatge;
@@ -26,10 +26,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         // Definim els listeners
-        botoInici = ((Button)findViewById(R.id.buttonCancelar));
+        botoInici = ((Button)findViewById(R.id.buttonIniciarSessio));
         botoInici.setOnClickListener(this);
         botoAlta = ((Button)findViewById(R.id.buttonDonarAlta));
         botoAlta.setOnClickListener(this);
+        botoSortir = ((Button)findViewById(R.id.buttonSortir));
+        botoSortir.setOnClickListener(this);
 
         textUsuari = ((TextView)findViewById(R.id.textUsuari));
         textContrasenya = ((TextView)findViewById(R.id.textContrasenya));
@@ -51,28 +53,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         // Obté les dades de login introduïdes per l'usuari
-        String usuariIntroduit = textUsuari.getText().toString();
-        String passIntroduit = textContrasenya.getText().toString();
+        final String usuariIntroduit = textUsuari.getText().toString();
+        final String passIntroduit = textContrasenya.getText().toString();
 
         //  Mirem en quin botó ha fet click l'usuari
         if(v == botoInici) {
 
             final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit+"-Mobile";
-            Thread thread = new Thread(new Runnable() {
+            final Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
                     try  {
                         ConnexioServidor connexioServidor = new ConnexioServidor();
                         codiSessio = connexioServidor.consulta(codiRequest);
-                        if(codiSessio.equals("FAIL")){
-                            showToast("Usuari o contrasenya invàlids");
-                        }else if (codiSessio.startsWith("OK")){
-                            showToast("Usuari o contrasenya vàlids");
-                            Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
-                            startActivity(i);
-                        }else{
-                            showToast("El servidor no respon");
+                        if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
+                            showToast("Falten dades");
+                        } else {
+                            if(codiSessio.equals("FAIL")){
+                                showToast("Usuari o contrasenya invàlids");
+                            }else if (codiSessio.startsWith("OK")){
+                                showToast("Usuari i contrasenya vàlids");
+                                Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
+                                startActivity(i);
+                            }else{
+                                showToast("El servidor no respon");
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -86,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == botoAlta) {
             Intent i = new Intent(this, AltaUsuariActivity.class);
             startActivity(i);
+        } else if (v == botoSortir) {
+            finish();
         }
 
     }

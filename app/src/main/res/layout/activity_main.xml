@@ -51,7 +51,7 @@
         android:id="@+id/textUsuari"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="56dp"
         android:ems="10"
         android:hint="@string/introdueix_usuari"
         android:inputType="textPersonName"
@@ -80,7 +80,7 @@
         android:id="@+id/textContrasenya"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="56dp"
         android:ems="10"
         android:hint="@string/introdueix_contrasenya"
         android:inputType="textPassword"
@@ -90,18 +90,7 @@
         app:layout_constraintTop_toTopOf="@+id/textUsuari"></EditText>
 
     <Button
-        android:id="@+id/buttonDonarAlta"
-        style="@android:style/Widget.DeviceDefault.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
-        android:text="@string/nou_usuari"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonCancelar"
-        app:layout_constraintTop_toBottomOf="@+id/textContrasenya" />
-
-    <Button
-        android:id="@+id/buttonCancelar"
+        android:id="@+id/buttonIniciarSessio"
         style="@android:style/Widget.DeviceDefault.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -109,6 +98,29 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/buttonDonarAlta"
         app:layout_constraintEnd_toStartOf="@+id/buttonDonarAlta"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonDonarAlta"
+        style="@android:style/Widget.DeviceDefault.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/nou_usuari"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonIniciarSessio"
+        app:layout_constraintTop_toBottomOf="@+id/textContrasenya" />
+
+
+    <Button
+        android:id="@+id/buttonSortir"
+        style="@android:style/Widget.DeviceDefault.Button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/sortir"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
     <TextView
