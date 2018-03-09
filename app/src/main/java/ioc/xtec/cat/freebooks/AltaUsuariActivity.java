@@ -12,7 +12,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
 
     // Variables dels botons
     Button botoAltaUsuari, botoCancelar;
-    //Variables pels editText
+    // Variables pels editText
     EditText userText,userPass,userConfirmPass,userEmail;
     private String resposta = "";
 
