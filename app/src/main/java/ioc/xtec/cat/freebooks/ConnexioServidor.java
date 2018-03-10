@@ -11,6 +11,8 @@ import java.net.Socket;
  */
 
 public class ConnexioServidor {
+
+    // Variable amb la resposta
     String resposta = "";
 
     /**

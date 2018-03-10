@@ -16,6 +16,14 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
     EditText userText,userPass,userConfirmPass,userEmail;
     private String resposta = "";
 
+    // Variable amb l'intent
+    Intent i;
+
+    /**
+     * Accions en la creació
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,23 +33,23 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
         userPass = (EditText)findViewById(R.id.textContrasenya);
         userConfirmPass = (EditText)findViewById(R.id.textConfirmaContrasenya);
         userEmail = (EditText)findViewById(R.id.textMail);
+
         // Definim els listeners
         botoAltaUsuari = ((Button)findViewById(R.id.buttonDonarAlta));
         botoAltaUsuari.setOnClickListener(this);
         botoCancelar = ((Button)findViewById(R.id.buttonCancelar));
         botoCancelar.setOnClickListener(this);
+
+        // Crea un intent amb la pantalla de login
+        i = new Intent(this, MainActivity.class);
     }
 
-    public void showToast(final String toast)
-    {
-        runOnUiThread(new Runnable() {
-            public void run()
-            {
-                Toast.makeText(AltaUsuariActivity.this, toast, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
+    /**
+     * Accions al fer click sobre els botons
+     *
+     * @param v amb el view on s'ha fet click
+     */
     @Override
     public void onClick(View v) {
         // Obté les dades de login introduïdes per l'usuari
@@ -49,8 +57,6 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
         String passIntroduit = userPass.getText().toString();
         String passConfirmacioIntroduit = userConfirmPass.getText().toString();
         String emailIntroduit = userEmail.getText().toString();
-
-        final Intent i = new Intent(this, MainActivity.class);
 
 
         if (v == botoAltaUsuari) {
@@ -61,30 +67,68 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
                 if(!passIntroduit.equals(passConfirmacioIntroduit)) {
                     showToast("Contrasenya diferent");
                 } else{
-                    final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
-                    Thread thread = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try  {
-                                ConnexioServidor connexioServidor = new ConnexioServidor();
-                                resposta = connexioServidor.consulta(codiRequest);
-                                if(resposta.equals("OK")){
-                                    showToast("Usuari Creat");
-                                    startActivity(i);
-                                }else{
-                                    showToast("L'usuari ja existeix");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    thread.start();
+                    // Crida per donar d'alta l'usuari
+                    altaUsuari();
                 }
             }
         } else {
             startActivity(i);
+            finish();
         }
     }
+
+
+    /**
+     * Torna a la pantalla de login en cas de prémer el botó "Back"
+     */
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(i);
+        finish();
+    }
+
+    /**
+     * Dona d'alta l'usuari amb tote les dades introduïdes
+     */
+    public void altaUsuari() {
+        final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    ConnexioServidor connexioServidor = new ConnexioServidor();
+                    resposta = connexioServidor.consulta(codiRequest);
+                    if(resposta.equals("OK")){
+                        showToast("Usuari Creat");
+                        startActivity(i);
+                        finish();
+                    }else{
+                        showToast("L'usuari ja existeix");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    /**
+     * Crea un missatge tipus toast
+     *
+     * @param toast amb el text del missatge
+     */
+    public void showToast(final String toast)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(AltaUsuariActivity.this, toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

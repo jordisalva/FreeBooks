@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-
     // Variables dels botons
     Button botoInici, botoAlta, botoSortir;
 
@@ -20,6 +19,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Codi per identificar la sessió
     private String codiSessio = "";
 
+    /**
+     * Accions en la creació
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+    /**
+     * Accions al fer click sobre els botons
+     *
+     * @param v amb el view on s'ha fet click
+     */
+    @Override
+    public void onClick(View v) {
+
+        //  Mirem en quin botó ha fet click l'usuari
+        if(v == botoInici) {
+            // Crida per iniciar la sessió
+            iniciarSessio();
+        } else if (v == botoAlta) {
+            Intent i = new Intent(this, AltaUsuariActivity.class);
+            startActivity(i);
+            finish();
+        } else if (v == botoSortir) {
+            finish();
+        }
+
+    }
+
+    /**
+     * Envia les dades al servidor perqué aquest validi el login
+     * Si es correcte inicia sessió, en cas contrari mostrarà missatges indicant l'error
+     */
+    public void iniciarSessio() {
+        // Obté les dades de login introduïdes per l'usuari
+        final String usuariIntroduit = textUsuari.getText().toString();
+        final String passIntroduit = textContrasenya.getText().toString();
+
+        final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit+"-Mobile";
+        final Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    ConnexioServidor connexioServidor = new ConnexioServidor();
+                    codiSessio = connexioServidor.consulta(codiRequest);
+                    if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
+                        showToast("Falten dades");
+                    } else {
+                        if(codiSessio.equals("FAIL")){
+                            showToast("Usuari o contrasenya invàlids");
+                        }else if (codiSessio.startsWith("OK")){
+                            showToast("Usuari i contrasenya vàlids");
+                            Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
+                            startActivity(i);
+                            finish();
+                        }else{
+                            showToast("El servidor no respon");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+    }
+
+    /**
+     * Crea un missatge tipus toast
+     *
+     * @param toast amb el text del missatge
+     */
     public void showToast(final String toast)
     {
         runOnUiThread(new Runnable() {
@@ -48,55 +120,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-    @Override
-    public void onClick(View v) {
-
-        // Obté les dades de login introduïdes per l'usuari
-        final String usuariIntroduit = textUsuari.getText().toString();
-        final String passIntroduit = textContrasenya.getText().toString();
-
-        //  Mirem en quin botó ha fet click l'usuari
-        if(v == botoInici) {
-
-            final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit+"-Mobile";
-            final Thread thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try  {
-                        ConnexioServidor connexioServidor = new ConnexioServidor();
-                        codiSessio = connexioServidor.consulta(codiRequest);
-                        if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
-                            showToast("Falten dades");
-                        } else {
-                            if(codiSessio.equals("FAIL")){
-                                showToast("Usuari o contrasenya invàlids");
-                            }else if (codiSessio.startsWith("OK")){
-                                showToast("Usuari i contrasenya vàlids");
-                                Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
-                                startActivity(i);
-                            }else{
-                                showToast("El servidor no respon");
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            thread.start();
-
-
-        } else if (v == botoAlta) {
-            Intent i = new Intent(this, AltaUsuariActivity.class);
-            startActivity(i);
-        } else if (v == botoSortir) {
-            finish();
-        }
-
-    }
-
 
 }
