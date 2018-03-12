@@ -105,8 +105,10 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
                         showToast("Usuari Creat");
                         startActivity(i);
                         finish();
-                    }else{
+                    }else if(resposta.equals("FAIL")){
                         showToast("L'usuari ja existeix");
+                    }else{
+                        showToast("El server no respon");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
