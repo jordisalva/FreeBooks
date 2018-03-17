@@ -57,25 +57,27 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         barra_progres.setMax(100);
 
         // Preparem la font de les dades
-        llistaLlibres = new ArrayList<Llibre>();
+        //llistaLlibres = new ArrayList<Llibre>();
         //PROVISIONAL!!
-        for(int i = 1; i <= 10; i++){
+        /*for(int i = 1; i <= 10; i++){
             llistaLlibres.add(new Llibre("Prova","Prova","Prova",""));
-        }
+        }*/
 
         //Referenciem el RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.rView);
 
         //Afegim l'adaptador amb les dades i el LinearLayoutManager que pintarà les dades
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new Adaptador(this, llistaLlibres);
-        recyclerView.setAdapter(adapter);
+        //adapter = new Adaptador(this, llistaLlibres);
+        //recyclerView.setAdapter(adapter);
 
         //Podem utilitzar animacions sobre la llista
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        //recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         // Amaguem la barra de progrés
         barra_progres.setVisibility(View.GONE);
+
+        new MyTask().execute((Void) null);
 
     }
 
@@ -205,11 +207,20 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      * AsyncTask que carrega les dades dels llibres del servidor, rep Strings com paràmetre
      * d'entrada, actualitza el progrés amb Integers i no retorna res
      */
-    private class MyTask extends AsyncTask<String, Integer, String>
+    private class MyTask extends AsyncTask<Void, Integer, String>
     {
-        protected String doInBackground(String... u)
+        protected String doInBackground(Void... voids)
         {
             // do something in background
+            String llistaBooks = "";
+            ConnexioServidor connexioServidor = new ConnexioServidor();
+            llistaBooks = connexioServidor.consulta("getBooks");
+            String[] llibresArray = llistaBooks.split("~");
+            llistaLlibres = new ArrayList<Llibre>();
+            for(String llib: llibresArray){
+                llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],llib.split("-")[2],llib.split("-")[3]));
+            }
+
             return null;
         }
         protected void onPreExecute()
@@ -223,6 +234,10 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         protected void onPostExecute(String result)
         {
             //  do something after execution
+            adapter = new Adaptador(PrincipalActivity.this, llistaLlibres);
+            recyclerView.setAdapter(adapter);
+            //Podem utilitzar animacions sobre la llista
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         }
     }
