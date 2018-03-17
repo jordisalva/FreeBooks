@@ -108,7 +108,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
                     }else if(resposta.equals("FAIL")){
                         showToast("L'usuari ja existeix");
                     }else{
-                        showToast("El server no respon");
+                        showToast("El servidor no respon");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

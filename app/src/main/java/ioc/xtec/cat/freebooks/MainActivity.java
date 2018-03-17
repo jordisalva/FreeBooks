@@ -81,21 +81,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run() {
                 try  {
-                    ConnexioServidor connexioServidor = new ConnexioServidor();
-                    codiSessio = connexioServidor.consulta(codiRequest);
-                    if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
-                        showToast("Falten dades");
-                    } else {
-                        if(codiSessio.equals("FAIL")){
-                            showToast("Usuari o contrasenya invàlids");
-                        }else if (codiSessio.startsWith("OK")){
-                            showToast("Usuari i contrasenya vàlids");
-                            Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
-                            startActivity(i);
-                            finish();
-                        }else{
-                            showToast("El servidor no respon");
+                    try {
+                        if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
+                            showToast("Falten dades");
+                        } else {
+                            ConnexioServidor connexioServidor = new ConnexioServidor();
+                            codiSessio = connexioServidor.consulta(codiRequest);
+                            if(codiSessio.equals("FAIL")){
+                                showToast("Usuari o contrasenya invàlids");
+                            }else if (codiSessio.startsWith("OK")){
+                                showToast("Usuari i contrasenya vàlids");
+                                Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
+                                startActivity(i);
+                                finish();
+                            }else{
+                                showToast("El servidor no respon");
+                            }
                         }
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -24,7 +25,8 @@ public class ConnexioServidor {
      */
     public String consulta(String dades) {
         try{
-            Socket socket = new Socket("10.0.2.2", 9999);
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress("10.0.2.2", 9999), 1000);
             try(BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))){
                 escriptor.write(dades);
                 escriptor.newLine();

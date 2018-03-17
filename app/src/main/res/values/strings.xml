@@ -18,4 +18,8 @@
     <string name="imageLogoBooks">logoBooks</string>
     <string name="imageAddUser">addUser</string>
     <string name="sortir">Sortir</string>
+    <string name="app_logout">Logout</string>
+    <string name="app_refresh">Refresh</string>
+    <string name="app_search">Search</string>
+    <string name="thumbnail">thumbnail</string>
 </resources>
