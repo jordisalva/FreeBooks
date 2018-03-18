@@ -2,8 +2,10 @@ package ioc.xtec.cat.freebooks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,16 +53,16 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
         //Obtenim la imatge
         String imatgePortada = items.get(position).imatgePortada;
 
-        /**
-         Exemple pasar String base64 a imatge
+
+         //Exemple pasar String base64 a imatge
          String base64String = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAA...";
-         String base64Image = base64String.split(",")[1];
+         String base64Image = imatgePortada.split(",")[1];
 
          byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
          Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-         imageView.setImageBitmap(decodedByte);
-         **/
+        //viewHolder.vThumbnail.setImageBitmap(decodedByte);
+
 
         //Si existiex l'imatge al directori cache
         if (imatgePortada.equals("")) {
@@ -72,7 +74,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
             //Cas que no
         } else {
             //La carrega
-            viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
+            //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
+            viewHolder.vThumbnail.setImageBitmap(decodedByte);
             viewHolder.vTitle.setText(items.get(position).titol);
         }
 
