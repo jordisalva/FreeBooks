@@ -56,7 +56,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
 
          //Exemple pasar String base64 a imatge
          String base64String = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAA...";
-         String base64Image = imatgePortada.split(",")[1];
+         //String base64Image = imatgePortada.split(",")[1];
+        String base64Image = imatgePortada;
 
          byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
          Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
