@@ -57,7 +57,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         barra_progres.setMax(100);
 
         // Preparem la font de les dades
-        //llistaLlibres = new ArrayList<Llibre>();
+        llistaLlibres = new ArrayList<Llibre>();
         //PROVISIONAL!!
         /*for(int i = 1; i <= 10; i++){
             llistaLlibres.add(new Llibre("Prova","Prova","Prova",""));
@@ -68,16 +68,19 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
         //Afegim l'adaptador amb les dades i el LinearLayoutManager que pintarà les dades
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //adapter = new Adaptador(this, llistaLlibres);
-        //recyclerView.setAdapter(adapter);
+        adapter = new Adaptador(this, llistaLlibres);
+        recyclerView.setAdapter(adapter);
 
         //Podem utilitzar animacions sobre la llista
-        //recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        // Amaguem la barra de progrés
-        barra_progres.setVisibility(View.GONE);
+        // Amaguem el recyclerView
+        recyclerView.setVisibility(View.INVISIBLE);
+        // Mostrem la barra de progrés
+        barra_progres.setVisibility(View.VISIBLE);
 
-        new MyTask().execute((Void) null);
+        // Executem la tasca per carregar els llibres
+        new CarregaLlibres().execute((Void) null);
 
     }
 
@@ -112,7 +115,17 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Tanca la sessió
             tancaSessio();
         } else if (id == R.id.app_refresh) {
-            // Refresca la llista de llibre
+            // Refresca la llista de llibres
+
+            // Amaga el recyclerView
+            recyclerView.setVisibility(View.GONE);
+
+            // Mostrem la barra de progrés
+            barra_progres.setVisibility(View.VISIBLE);
+
+            // Executem la tasca per carregar els llibres
+            new CarregaLlibres().execute((Void) null);
+
 
         }
 
@@ -207,7 +220,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      * AsyncTask que carrega les dades dels llibres del servidor, rep Strings com paràmetre
      * d'entrada, actualitza el progrés amb Integers i no retorna res
      */
-    private class MyTask extends AsyncTask<Void, Integer, String>
+    private class CarregaLlibres extends AsyncTask<Void, Integer, String>
     {
         protected String doInBackground(Void... voids)
         {
@@ -216,9 +229,24 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             ConnexioServidor connexioServidor = new ConnexioServidor();
             llistaBooks = connexioServidor.consulta("getBooks");
             String[] llibresArray = llistaBooks.split("~");
-            llistaLlibres = new ArrayList<Llibre>();
+            llistaLlibres.clear();
+            //llistaLlibres = new ArrayList<Llibre>();
             for(String llib: llibresArray){
-                llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],llib.split("-")[2],llib.split("-")[3]));
+                //Exemple pasar String base64 a imatge
+                //String base64Image = base64String.split(",")[1];
+                //if (!llib.split("-")[3].equals("")) {
+
+
+                    llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],
+                            llib.split("-")[2],llib.split("-")[3],llib.split("-")[4],llib.split("-")[5],llib.split("-")[6],llib.split("-")[7]));
+                //}
+            }
+
+            // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
             return null;
@@ -226,18 +254,22 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         protected void onPreExecute()
         {
             // do something before start
+            super.onPreExecute();
+            //barra_progres.setProgress(0);
         }
         public void onProgressUpdate(Integer... args)
         {
-
+            // Actualitzem la barra de progrés amb el valor que se'ns ha enviat des de doInBackground
+            //barra_progres.setProgress(args[0]);
         }
         protected void onPostExecute(String result)
         {
-            //  do something after execution
-            adapter = new Adaptador(PrincipalActivity.this, llistaLlibres);
-            recyclerView.setAdapter(adapter);
-            //Podem utilitzar animacions sobre la llista
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            //Després de cada modificació a la font de les dades, hem de notificar-ho a l'adaptador
+            //adapter.notifyDataSetChanged();
+            // Mostrem el recyclerView
+            recyclerView.setVisibility(View.VISIBLE);
+            // Amaguem la barra de progrés
+            barra_progres.setVisibility(View.GONE);
 
         }
     }

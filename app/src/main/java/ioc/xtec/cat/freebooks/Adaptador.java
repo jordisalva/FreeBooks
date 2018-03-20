@@ -2,8 +2,10 @@ package ioc.xtec.cat.freebooks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,32 +51,31 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
          * */
 
         //Obtenim la imatge
-        String imatgePortada = items.get(position).imatgePortada;
+        //String imatgePortada = items.get(position).imatgePortada;
 
-        /**
-         Exemple pasar String base64 a imatge
-         String base64String = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAA...";
-         String base64Image = base64String.split(",")[1];
+        //Obtenim la imatge
+        //Bitmap imatgePortadaByte = items.get(position).imatgePortadaByte;
 
-         byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
-         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-         imageView.setImageBitmap(decodedByte);
-         **/
-
-        //Si existiex l'imatge al directori cache
-        if (imatgePortada.equals("")) {
+        //if (imatgePortadaByte.equals("")) {
             //Mostra una imatge per defecte
-            viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
-            viewHolder.vThumbnail.getLayoutParams().height = 250;
-            viewHolder.vThumbnail.getLayoutParams().width = 250;
-            viewHolder.vTitle.setText(items.get(position).titol);
+            //viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+            //viewHolder.vThumbnail.getLayoutParams().height = 250;
+            //viewHolder.vThumbnail.getLayoutParams().width = 250;
+            //viewHolder.vTitle.setText(items.get(position).titol);
             //Cas que no
-        } else {
+        //} else {
             //La carrega
-            viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
+            //String base64String = llib.split("-")[3];
+            String base64StringImage = items.get(position).imatgePortada;
+            //String base64Image = base64String.split(",")[1];
+
+            byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            viewHolder.vThumbnail.setImageBitmap(decodedByte);
+            //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
             viewHolder.vTitle.setText(items.get(position).titol);
-        }
+        //}
 
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +87,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
                 intent.putExtra("Autor", items.get(position).autor);
                 intent.putExtra("Descripcio", items.get(position).descripcio);
                 intent.putExtra("ImatgePortada", items.get(position).imatgePortada);
+                //Afegir resta de camps aqui....
                 context.startActivity(intent);
             }
         });
