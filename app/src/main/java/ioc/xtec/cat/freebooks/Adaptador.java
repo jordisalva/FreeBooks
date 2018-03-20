@@ -45,10 +45,10 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
     //Carreguem els widgets amb les dades (l'invoca el layout manager)
     @Override
     public void onBindViewHolder(final ElMeuViewHolder viewHolder, final int position) {
-        /* *
-         * position conté la posició de l'element actual a la llista. També l'utilitzarem
-         * com a índex per a recòrrer les dades
-         * */
+        /**
+         *position conté la posició de l'element actual a la llista. També l'utilitzarem
+         *com a índex per a recòrrer les dades
+         **/
 
         //Obtenim la imatge
         //String imatgePortada = items.get(position).imatgePortada;
