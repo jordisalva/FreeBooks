@@ -125,8 +125,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
             // Executem la tasca per carregar els llibres
             new CarregaLlibres().execute((Void) null);
-
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -235,7 +233,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 //Exemple pasar String base64 a imatge
                 //String base64Image = base64String.split(",")[1];
                 //if (!llib.split("-")[3].equals("")) {
-
 
                     llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],
                             llib.split("-")[2],llib.split("-")[3],llib.split("-")[4],llib.split("-")[5],llib.split("-")[6],llib.split("-")[7]));

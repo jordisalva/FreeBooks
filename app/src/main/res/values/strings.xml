@@ -22,4 +22,21 @@
     <string name="app_refresh">Refresh</string>
     <string name="app_search">Search</string>
     <string name="thumbnail">thumbnail</string>
+    <string name="titol_info_llibre">Informació del llibre</string>
+    <string name="imatge_llibre">Imatge del llibre</string>
+    <string name="label_titol">Títol:</string>
+    <string name="label_autor">Autor:</string>
+    <string name="label_descripcio">Descripció:</string>
+    <string name="label_isbn">ISBN:</string>
+    <string name="label_idioma">Idioma:</string>
+    <string name="label_pagines">Pàgines:</string>
+    <string name="label_editor_i_any">Editor i Any:</string>
+    <string name="text_editoriany">Editor i Any</string>
+    <string name="text_pagines">Pàgines</string>
+    <string name="text_idioma">Idioma</string>
+    <string name="text_isbn">ISBN</string>
+    <string name="text_titol">Títol</string>
+    <string name="text_autor">Autor</string>
+    <string name="text_descripcio">Descripció</string>
+    <string name="boto_reserva">Reserva\'l</string>
 </resources>

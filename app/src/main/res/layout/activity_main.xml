@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/titol"
+        android:id="@+id/titolInfoLlibre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -57,7 +57,7 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/labelUsuari"
-        app:layout_constraintTop_toBottomOf="@+id/titol">
+        app:layout_constraintTop_toBottomOf="@+id/titolInfoLlibre">
 
         <requestFocus
             android:layout_width="wrap_content"

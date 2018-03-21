@@ -32,6 +32,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".VisualitzarInfoLlibre">
+            <intent-filter>
+                <action android:name="ioc.xtec.cat.freebooks.VisualitzarInfoLlibre" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

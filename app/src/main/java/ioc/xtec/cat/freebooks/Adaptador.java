@@ -87,7 +87,10 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
                 intent.putExtra("Autor", items.get(position).autor);
                 intent.putExtra("Descripcio", items.get(position).descripcio);
                 intent.putExtra("ImatgePortada", items.get(position).imatgePortada);
-                //Afegir resta de camps aqui....
+                intent.putExtra("EditorIAny", items.get(position).edAndYear);
+                intent.putExtra("NumPagines", items.get(position).numPags);
+                intent.putExtra("Idioma", items.get(position).idioma);
+                intent.putExtra("ISBN", items.get(position).ISBN);
                 context.startActivity(intent);
             }
         });
