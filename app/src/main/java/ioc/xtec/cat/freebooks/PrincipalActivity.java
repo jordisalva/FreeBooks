@@ -226,25 +226,28 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             String llistaBooks = "";
             ConnexioServidor connexioServidor = new ConnexioServidor();
             llistaBooks = connexioServidor.consulta("getBooks");
-            String[] llibresArray = llistaBooks.split("~");
-            llistaLlibres.clear();
-            //llistaLlibres = new ArrayList<Llibre>();
-            for(String llib: llibresArray){
-                //Exemple pasar String base64 a imatge
-                //String base64Image = base64String.split(",")[1];
-                //if (!llib.split("-")[3].equals("")) {
+            if(!llistaBooks.isEmpty()){
+                String[] llibresArray = llistaBooks.split("~");
+                llistaLlibres.clear();
+                //llistaLlibres = new ArrayList<Llibre>();
+                for(String llib: llibresArray){
+                    //Exemple pasar String base64 a imatge
+                    //String base64Image = base64String.split(",")[1];
+                    //if (!llib.split("-")[3].equals("")) {
 
                     llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],
                             llib.split("-")[2],llib.split("-")[3],llib.split("-")[4],llib.split("-")[5],llib.split("-")[6],llib.split("-")[7]));
-                //}
+                    //}
+                }
             }
 
+
             // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
-            try {
+            /**try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             return null;
         }
