@@ -82,6 +82,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public  void onClick(View v) {
+                //Passem la imatge com a SharedPreferences
                 SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
                 SharedPreferences.Editor ed = pref.edit();
                 ed.putString("ImatgePortada",items.get(position).imatgePortada);
