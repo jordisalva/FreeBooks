@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
+
     // Variables dels botons
     Button botoInici, botoAlta, botoSortir;
 
@@ -90,8 +93,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if(codiSessio.equals("FAIL")){
                                 showToast("Usuari o contrasenya invàlids");
                             }else if (codiSessio.startsWith("OK")){
+                                String message = usuariIntroduit + "-Mobile";
                                 showToast("Usuari i contrasenya vàlids");
                                 Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
+                                i.putExtra(EXTRA_MESSAGE,message);
                                 startActivity(i);
                                 finish();
                             }else{

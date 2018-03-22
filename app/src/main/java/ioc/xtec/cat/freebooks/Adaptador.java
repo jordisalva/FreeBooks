@@ -2,6 +2,7 @@ package ioc.xtec.cat.freebooks;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -58,35 +59,39 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
 
 
         //if (imatgePortadaByte.equals("")) {
-            //Mostra una imatge per defecte
-            //viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
-            //viewHolder.vThumbnail.getLayoutParams().height = 250;
-            //viewHolder.vThumbnail.getLayoutParams().width = 250;
-            //viewHolder.vTitle.setText(items.get(position).titol);
-            //Cas que no
+        //Mostra una imatge per defecte
+        //viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+        //viewHolder.vThumbnail.getLayoutParams().height = 250;
+        //viewHolder.vThumbnail.getLayoutParams().width = 250;
+        //viewHolder.vTitle.setText(items.get(position).titol);
+        //Cas que no
         //} else {
-            //La carrega
-            //String base64String = llib.split("-")[3];
-            String base64StringImage = items.get(position).imatgePortada;
-            //String base64Image = base64String.split(",")[1];
+        //La carrega
+        //String base64String = llib.split("-")[3];
+        String base64StringImage = items.get(position).imatgePortada;
+        //String base64Image = base64String.split(",")[1];
 
-            byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            viewHolder.vThumbnail.setImageBitmap(decodedByte);
-            //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
-            viewHolder.vTitle.setText(items.get(position).titol);
+        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+        final Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        viewHolder.vThumbnail.setImageBitmap(decodedByte);
+        //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
+        viewHolder.vTitle.setText(items.get(position).titol);
         //}
 
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public  void onClick(View v) {
+                SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
+                SharedPreferences.Editor ed = pref.edit();
+                ed.putString("ImatgePortada",items.get(position).imatgePortada);
+                ed.commit();
                 //Crea un nou intent per visualitzar la informació del llibre
                 Intent intent = new Intent(context, VisualitzarInfoLlibre.class);
                 intent.putExtra("Titol", items.get(position).titol);
                 intent.putExtra("Autor", items.get(position).autor);
                 intent.putExtra("Descripcio", items.get(position).descripcio);
-                intent.putExtra("ImatgePortada", items.get(position).imatgePortada);
+                //intent.putExtra("ImatgePortada", items.get(position).imatgePortada);
                 intent.putExtra("EditorIAny", items.get(position).edAndYear);
                 intent.putExtra("NumPagines", items.get(position).numPags);
                 intent.putExtra("Idioma", items.get(position).idioma);

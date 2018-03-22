@@ -261,8 +261,12 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         }
         protected void onPostExecute(String result)
         {
+            //recyclerView.setAdapter(adapter);
+
+            //Podem utilitzar animacions sobre la llista
+            //recyclerView.setItemAnimator(new DefaultItemAnimator());
             //Després de cada modificació a la font de les dades, hem de notificar-ho a l'adaptador
-            //adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
             // Mostrem el recyclerView
             recyclerView.setVisibility(View.VISIBLE);
             // Amaguem la barra de progrés

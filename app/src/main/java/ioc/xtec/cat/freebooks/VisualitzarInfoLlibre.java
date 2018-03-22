@@ -1,6 +1,8 @@
 package ioc.xtec.cat.freebooks;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -39,6 +41,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualitzar_info_llibre);
         Bundle bundle = getIntent().getExtras();
+        SharedPreferences pref = getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = pref.edit();
 
         textTitol = (TextView) findViewById(R.id.textTitol);
         textAutor = (TextView) findViewById(R.id.textAutor);
@@ -52,7 +56,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textTitol.setText(bundle.getString("Titol"));
         textAutor.setText(bundle.getString("Autor"));
         textDescripcio.setText(bundle.getString("Descripcio"));
-        strImatge = bundle.getString("ImatgePortada");
+        //strImatge = bundle.getString("ImatgePortada");
+        strImatge = pref.getString("ImatgePortada",null);
         byte[] decodedString = Base64.decode(strImatge, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imatgeLlibre.setImageBitmap(decodedByte);
@@ -69,6 +74,10 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
 
         // Crea un intent amb la pantalla de login
         i = new Intent(this, PrincipalActivity.class);
+
+        ed.remove("ImatgePortada");
+        ed.clear();
+        ed.commit();
     }
 
     /**
