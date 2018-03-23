@@ -235,8 +235,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                     //String base64Image = base64String.split(",")[1];
                     //if (!llib.split("-")[3].equals("")) {
 
-                    llistaLlibres.add(new Llibre(llib.split("-")[0],llib.split("-")[1],
-                            llib.split("-")[2],llib.split("-")[3],llib.split("-")[4],llib.split("-")[5],llib.split("-")[6],llib.split("-")[7]));
+                    llistaLlibres.add(new Llibre(llib.split("Sep@!-@rad0R")[0],llib.split("Sep@!-@rad0R")[1],
+                            llib.split("Sep@!-@rad0R")[2],llib.split("Sep@!-@rad0R")[3],llib.split("Sep@!-@rad0R")[4],llib.split("Sep@!-@rad0R")[5],llib.split("Sep@!-@rad0R")[6],llib.split("Sep@!-@rad0R")[7]));
                     //}
                 }
             }

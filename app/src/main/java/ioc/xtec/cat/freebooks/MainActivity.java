@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final String usuariIntroduit = textUsuari.getText().toString();
         final String passIntroduit = textContrasenya.getText().toString();
 
-        final String codiRequest = "userLogin-"+usuariIntroduit +"-"+passIntroduit+"-Mobile";
+        final String codiRequest = "userLogin"+"Sep@!-@rad0R"+usuariIntroduit +"Sep@!-@rad0R"+passIntroduit+"Sep@!-@rad0R"+"Mobile";
         final Thread thread = new Thread(new Runnable() {
 
             @Override
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if(codiSessio.equals("FAIL")){
                                 showToast("Usuari o contrasenya invàlids");
                             }else if (codiSessio.startsWith("OK")){
-                                String message = usuariIntroduit + "-Mobile";
+                                String message = usuariIntroduit +"Sep@!-@rad0R"+"Mobile";
                                 showToast("Usuari i contrasenya vàlids");
                                 Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
                                 i.putExtra(EXTRA_MESSAGE,message);

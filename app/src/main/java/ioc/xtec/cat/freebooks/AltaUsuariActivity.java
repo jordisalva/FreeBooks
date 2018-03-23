@@ -93,7 +93,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
      * Dona d'alta l'usuari amb tote les dades introduïdes
      */
     public void altaUsuari() {
-        final String codiRequest = "nouLogin-"+userText.getText()+"-"+userPass.getText()+"-Mobile-"+userEmail.getText();
+        final String codiRequest = "nouLogin"+"Sep@!-@rad0R"+userText.getText()+"Sep@!-@rad0R"+userPass.getText()+"Sep@!-@rad0R"+"Mobile"+"Sep@!-@rad0R"+userEmail.getText();
         Thread thread = new Thread(new Runnable() {
 
             @Override
