@@ -68,7 +68,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
         //} else {
         //La carrega
         //String base64String = llib.split("-")[3];
-        String base64StringImage = items.get(position).imatgePortada;
+        String base64StringImage = items.get(position).imatgePortada.split("@LENGTH@")[0];
         //String base64Image = base64String.split(",")[1];
 
         byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
