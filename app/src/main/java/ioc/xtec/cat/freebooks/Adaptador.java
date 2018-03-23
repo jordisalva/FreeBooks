@@ -85,7 +85,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
                 //Passem la imatge com a SharedPreferences
                 SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
                 SharedPreferences.Editor ed = pref.edit();
-                ed.putString("ImatgePortada",items.get(position).imatgePortada);
+                ed.putString("ImatgePortada",items.get(position).imatgePortada.split("@LENGTH@")[0]);
                 ed.commit();
                 //Crea un nou intent per visualitzar la informació del llibre
                 Intent intent = new Intent(context, VisualitzarInfoLlibre.class);
