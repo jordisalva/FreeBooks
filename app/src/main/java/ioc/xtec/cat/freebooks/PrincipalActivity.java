@@ -20,6 +20,10 @@ import java.util.ArrayList;
 
 public class PrincipalActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String SEPARADOR = "Sep@!-@rad0R";
+    public static final String SEPARADOR_IMATGE = "@LENGTH@";
+
+
     // Variable del botó logout
     Button botoLogout;
 
@@ -33,7 +37,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     private RecyclerView recyclerView;
     private Adaptador adapter;
     private ProgressBar barra_progres;
-    private int contador;
 
     /**
      * Accions en la creació
@@ -45,10 +48,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
-        // Definim els listeners
-        //botoLogout = ((Button)findViewById(R.id.app_logout));
-        //botoLogout.setOnClickListener(this);
-
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
 
@@ -58,10 +57,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
         // Preparem la font de les dades
         llistaLlibres = new ArrayList<Llibre>();
-        //PROVISIONAL!!
-        /*for(int i = 1; i <= 10; i++){
-            llistaLlibres.add(new Llibre("Prova","Prova","Prova",""));
-        }*/
 
         //Referenciem el RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.rView);
@@ -138,16 +133,15 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         /**if (v == botoLogout) {
-            tancaSessio();
-        }**/
+         tancaSessio();
+         }**/
     }
 
     /**
      * Torna a la pantalla de login en cas de prémer el botó "Back"
      */
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         // Crida per tancar la sessió
         tancaSessio();
     }
@@ -167,8 +161,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         alertDialogBuilder
                 .setMessage("Vol abandonar la sessió?")
                 .setCancelable(false)
-                .setPositiveButton("Sí",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         Thread thread = new Thread(new Runnable() {
 
                             @Override
@@ -176,7 +170,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                 ConnexioServidor connexioServidor = new ConnexioServidor();
                                 String codiRequest = "userLogout";
                                 String resposta = connexioServidor.consulta(codiRequest);
-                                if(resposta.equals("OK")){
+                                if (resposta.equals("OK")) {
                                     showToast("Sessió tancada correctament");
                                 }
                                 startActivity(i);
@@ -186,8 +180,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                         thread.start();
                     }
                 })
-                .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
                 });
@@ -204,11 +198,9 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      *
      * @param toast amb el text del missatge
      */
-    public void showToast(final String toast)
-    {
+    public void showToast(final String toast) {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
                 Toast.makeText(PrincipalActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
         });
@@ -218,63 +210,82 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      * AsyncTask que carrega les dades dels llibres del servidor, rep Strings com paràmetre
      * d'entrada, actualitza el progrés amb Integers i no retorna res
      */
-    private class CarregaLlibres extends AsyncTask<Void, Integer, String>
-    {
-        protected String doInBackground(Void... voids)
-        {
-            // do something in background
-            String llistaBooks = "";
+    private class CarregaLlibres extends AsyncTask<Void, Integer, String> {
+        protected String doInBackground(Void... voids) {
+            // Borrem la llista antiga de llibres
+            llistaLlibres.clear();
+            // Realitzem la connexió amb el servidor
             ConnexioServidor connexioServidor = new ConnexioServidor();
-            llistaBooks = connexioServidor.consulta("getBooks");
-            if(!llistaBooks.isEmpty()){
+            // El servidor retorna la llista de llibres en un string
+            String llistaBooks = connexioServidor.consulta("getBooks");
+            // Si la llista no és buida carreguem els llibres
+            if (!llistaBooks.isEmpty()) {
                 String[] llibresArray = llistaBooks.split("~");
-                llistaLlibres.clear();
-                //llistaLlibres = new ArrayList<Llibre>();
-                for(String llib: llibresArray){
-                    //Exemple pasar String base64 a imatge
-                    //String base64Image = base64String.split(",")[1];
-                    //if (!llib.split("-")[3].equals("")) {
-
-                    llistaLlibres.add(new Llibre(llib.split("Sep@!-@rad0R")[0],llib.split("Sep@!-@rad0R")[1],
-                            llib.split("Sep@!-@rad0R")[2],llib.split("Sep@!-@rad0R")[3],llib.split("Sep@!-@rad0R")[4],llib.split("Sep@!-@rad0R")[5],llib.split("Sep@!-@rad0R")[6],llib.split("Sep@!-@rad0R")[7]));
-                    //}
+                int midaArray = llibresArray.length;
+                // Recorrem l'array de llibres
+                for (int i = 0; i < midaArray; i++) {
+                    System.out.println("LLibre: " + i);
+                    String img = llibresArray[i].split(SEPARADOR)[3];
+                    /**
+                     * Mentres no coincideixi la mida de l'imatge, amb la mida real de l'imatge
+                     * que ens passa el servidor, tornarem realitzar la connexió per baixar de nou
+                     * les dades
+                     */
+                    while (img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1])) {
+                        System.out.println("llargada NO OK: " + img.length());
+                        // Tornem a realizar la connexió
+                        llistaBooks = connexioServidor.consulta("getBooks");
+                        llibresArray = llistaBooks.split("~");
+                        img = llibresArray[i].split(SEPARADOR)[3];
+                    }
+                    System.out.println("llargada OK: " + img.length());
+                    llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
+                            llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
+                            llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
                 }
+
+                // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                showToast("No hi ha llibres a la base de dades");
             }
-
-
-            // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
-            /**try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
 
             return null;
         }
-        protected void onPreExecute()
-        {
-            // do something before start
-            super.onPreExecute();
-            //barra_progres.setProgress(0);
-        }
-        public void onProgressUpdate(Integer... args)
-        {
-            // Actualitzem la barra de progrés amb el valor que se'ns ha enviat des de doInBackground
-            //barra_progres.setProgress(args[0]);
-        }
-        protected void onPostExecute(String result)
-        {
-            //recyclerView.setAdapter(adapter);
 
-            //Podem utilitzar animacions sobre la llista
-            //recyclerView.setItemAnimator(new DefaultItemAnimator());
-            //Després de cada modificació a la font de les dades, hem de notificar-ho a l'adaptador
+        /**
+         * S'executa abans de l'execució de la tasca
+         */
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        /**
+         * S'executa durant l'execució de la tasca
+         *
+         * @param args
+         */
+        public void onProgressUpdate(Integer... args) {
+            super.onProgressUpdate();
+        }
+
+        /**
+         * S'executa després de l'execució de la tasca
+         *
+         * @param result
+         */
+        protected void onPostExecute(String result) {
+            // Després de cada modificació a la font de les dades, hem de notificar-ho a l'adaptador
             adapter.notifyDataSetChanged();
             // Mostrem el recyclerView
             recyclerView.setVisibility(View.VISIBLE);
             // Amaguem la barra de progrés
             barra_progres.setVisibility(View.GONE);
-
         }
     }
 

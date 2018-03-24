@@ -67,6 +67,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textISBN.setText(bundle.getString("ISBN"));
 
         // Definim els listeners
+        // Definim els listeners
         btnReserva = ((Button)findViewById(R.id.btnReserva));
         btnReserva.setOnClickListener(this);
         btnTornar = ((Button)findViewById(R.id.btnTornar));

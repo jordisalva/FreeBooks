@@ -71,11 +71,18 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
         String base64StringImage = items.get(position).imatgePortada.split("@LENGTH@")[0];
         //String base64Image = base64String.split(",")[1];
 
-        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
-        final Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        Bitmap decodedByte = null;
+        try {
+            byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+            decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         viewHolder.vThumbnail.setImageBitmap(decodedByte);
         //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
         viewHolder.vTitle.setText(items.get(position).titol);
+
         //}
 
         //Al fer click sobre un llibre
