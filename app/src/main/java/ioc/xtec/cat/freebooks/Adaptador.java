@@ -10,6 +10,8 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,14 +21,18 @@ import java.util.ArrayList;
  * Created by jordi on 17/03/2018.
  */
 
-public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  {
-    private ArrayList<Llibre> items;
+public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> implements Filterable {
+
+    public static final String SEPARADOR_IMATGE = "@LENGTH@";
+    public ArrayList<Llibre> items, filterList;
     private Context context;
+    FiltreLlibres filter;
 
     //Creem el constructor
     public Adaptador(Context context, ArrayList<Llibre> items) {
         this.context = context;
         this.items= items;
+        this.filterList=items;
     }
     //Crea noves files (l'invoca el layout manager). Aquí fem referència al layout fila.xml
     @Override
@@ -43,6 +49,16 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
     public int getItemCount() {
         return items.size();
     }
+    // Retorna l'objecte filtrat
+    @Override
+    public Filter getFilter() {
+        if(filter==null)
+        {
+            filter=new FiltreLlibres(filterList,this);
+        }
+
+        return filter;
+    }
     //Carreguem els widgets amb les dades (l'invoca el layout manager)
     @Override
     public void onBindViewHolder(final ElMeuViewHolder viewHolder, final int position) {
@@ -50,26 +66,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
          *position conté la posició de l'element actual a la llista. També l'utilitzarem
          *com a índex per a recòrrer les dades
          **/
-
-        //Obtenim la imatge
-        //String imatgePortada = items.get(position).imatgePortada;
-
-        //Obtenim la imatge
-        //Bitmap imatgePortadaByte = items.get(position).imatgePortadaByte;
-
-
-        //if (imatgePortadaByte.equals("")) {
-        //Mostra una imatge per defecte
-        //viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
-        //viewHolder.vThumbnail.getLayoutParams().height = 250;
-        //viewHolder.vThumbnail.getLayoutParams().width = 250;
-        //viewHolder.vTitle.setText(items.get(position).titol);
-        //Cas que no
-        //} else {
-        //La carrega
-        //String base64String = llib.split("-")[3];
-        String base64StringImage = items.get(position).imatgePortada.split("@LENGTH@")[0];
-        //String base64Image = base64String.split(",")[1];
+        String base64StringImage = items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0];
 
         Bitmap decodedByte = null;
         try {
@@ -80,10 +77,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
         }
 
         viewHolder.vThumbnail.setImageBitmap(decodedByte);
-        //viewHolder.vThumbnail.setImageDrawable(Drawable.createFromPath(imatgePortada));
         viewHolder.vTitle.setText(items.get(position).titol);
-
-        //}
+        viewHolder.vAutor.setText(items.get(position).autor);
 
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +87,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
                 //Passem la imatge com a SharedPreferences
                 SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
                 SharedPreferences.Editor ed = pref.edit();
-                ed.putString("ImatgePortada",items.get(position).imatgePortada.split("@LENGTH@")[0]);
+                ed.putString("ImatgePortada",items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0]);
                 ed.commit();
                 //Crea un nou intent per visualitzar la informació del llibre
                 Intent intent = new Intent(context, VisualitzarInfoLlibre.class);
@@ -123,15 +118,16 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder>  
 
     }
 
-
     //Definim el nostre ViewHolder, és a dir, un element de la llista en qüestió
     public static class ElMeuViewHolder extends RecyclerView.ViewHolder {
-        protected TextView vTitle;
         protected ImageView vThumbnail;
+        protected TextView vTitle;
+        protected TextView vAutor;
         public ElMeuViewHolder(View v) {
             super(v);
             vThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             vTitle = (TextView) v.findViewById(R.id.title);
+            vAutor = (TextView) v.findViewById(R.id.autor);
         }
     }
 

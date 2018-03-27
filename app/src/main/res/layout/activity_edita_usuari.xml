@@ -13,22 +13,22 @@
 
 
     <ImageView
-        android:id="@+id/imageLogoBooks"
+        android:id="@+id/imageAddUser"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginStart="276dp"
-        android:contentDescription="@string/imageLogoBooks"
-        android:src="@drawable/logobooks"
+        android:contentDescription="@string/imageAddUser"
+        android:src="@drawable/adduser"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/titolAltaUsuari"
+        android:id="@+id/titolEditaUsuari"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="124dp"
-        android:text="@string/titol"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="100dp"
+        android:text="@string/titol_edita_usuari"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="36sp"
         android:textStyle="bold"
@@ -51,13 +51,13 @@
         android:id="@+id/textUsuari"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="@string/introdueix_usuari"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/labelUsuari"
-        app:layout_constraintTop_toBottomOf="@+id/titolAltaUsuari">
+        app:layout_constraintTop_toBottomOf="@+id/titolEditaUsuari">
 
         <requestFocus
             android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
         android:id="@+id/textContrasenya"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="@string/introdueix_contrasenya"
         android:inputType="textPassword"
@@ -89,38 +89,74 @@
         app:layout_constraintStart_toEndOf="@+id/labelContrasenya"
         app:layout_constraintTop_toTopOf="@+id/textUsuari"></EditText>
 
-    <Button
-        android:id="@+id/buttonIniciarSessio"
-        style="@android:style/Widget.DeviceDefault.Button"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/labelConfirmaContrasenya"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:text="@string/inici_sessio"
-        app:layout_constraintBaseline_toBaselineOf="@+id/buttonDonarAlta"
-        app:layout_constraintEnd_toStartOf="@+id/buttonDonarAlta"
+        android:text="@string/confirma_contrasenya"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textConfirmaContrasenya"
+        app:layout_constraintEnd_toStartOf="@+id/textConfirmaContrasenya"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <EditText
+        android:id="@+id/textMail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="76dp"
+        android:ems="10"
+        android:hint="@string/introdueix_mail"
+        android:inputType="textPersonName"
+        android:labelFor="@+id/labelConfirmaMail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/labelMail"
+        app:layout_constraintTop_toTopOf="@+id/textConfirmaContrasenya"></EditText>
+
+    <TextView
+        android:id="@+id/labelMail"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:text="@string/mail"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textMail"
+        app:layout_constraintEnd_toStartOf="@+id/textConfirmaContrasenya"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/textConfirmaContrasenya"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:ems="10"
+        android:hint="@string/introdueix_confirma_contrasenya"
+        android:inputType="textPassword"
+        android:labelFor="@+id/labelMail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/labelConfirmaContrasenya"
+        app:layout_constraintTop_toTopOf="@+id/textContrasenya"></EditText>
+
     <Button
-        android:id="@+id/buttonDonarAlta"
+        android:id="@+id/buttonGuardar"
         style="@android:style/Widget.DeviceDefault.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="@string/nou_usuari"
+        android:layout_marginTop="188dp"
+        android:text="@string/boto_guardar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonIniciarSessio"
+        app:layout_constraintStart_toEndOf="@+id/buttonCancelar"
         app:layout_constraintTop_toBottomOf="@+id/textContrasenya" />
 
-
     <Button
-        android:id="@+id/buttonSortir"
+        android:id="@+id/buttonCancelar"
         style="@android:style/Widget.DeviceDefault.Button"
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/sortir"
-        android:textColor="@android:color/holo_red_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:text="@string/boto_cancelar"
+        app:layout_constraintBaseline_toBaselineOf="@+id/buttonGuardar"
+        app:layout_constraintEnd_toStartOf="@+id/buttonGuardar"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <TextView
@@ -132,7 +168,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonDonarAlta" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonGuardar" />
 
 
 </android.support.constraint.ConstraintLayout>

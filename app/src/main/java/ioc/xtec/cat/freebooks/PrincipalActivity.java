@@ -1,6 +1,8 @@
 package ioc.xtec.cat.freebooks;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -37,6 +40,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     private RecyclerView recyclerView;
     private Adaptador adapter;
     private ProgressBar barra_progres;
+    MenuItem searchMenuItem;
+    SearchView searchView;
 
     /**
      * Accions en la creació
@@ -88,7 +93,28 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        SearchManager searchManager = (SearchManager)
+                getSystemService(Context.SEARCH_SERVICE);
+        searchMenuItem = menu.findItem(R.id.app_search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
+        searchView.requestFocusFromTouch();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -106,6 +132,13 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         if (id == R.id.app_search) {
             // Buscador de llibres
 
+        } else if (id == R.id.app_editUser) {
+            // Edita l'usuari
+
+            // Crea un intent amb la pantalla d'edició d'usuari
+            Intent iEditUser = new Intent(PrincipalActivity.this, EditaUsuariActivity.class);
+            startActivity(iEditUser);
+            finish();
         } else if (id == R.id.app_logout) {
             // Tanca la sessió
             tancaSessio();

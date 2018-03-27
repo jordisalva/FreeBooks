@@ -10,16 +10,22 @@
         android:title="@string/app_logout"
         app:showAsAction="always" />
     <item
+        android:id="@+id/app_editUser"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="200"
+        android:title="@string/app_logout"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/app_refresh"
         android:icon="@android:drawable/ic_popup_sync"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:title="@string/app_refresh"
         app:showAsAction="always" />
     <item
         android:id="@+id/app_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:orderInCategory="300"
+        android:orderInCategory="400"
         android:title="@string/app_search"
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always" />
+        app:showAsAction="collapseActionView|ifRoom" />
 </menu>

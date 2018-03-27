@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -28,8 +29,9 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     TextView textNumPagines;
     TextView textIdioma;
     TextView textISBN;
-    ImageView imatgeLlibre;
 
+    // Resta de variables
+    ImageView imatgeLlibre;
     Button btnReserva;
     Button btnTornar;
 
@@ -56,6 +58,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textTitol.setText(bundle.getString("Titol"));
         textAutor.setText(bundle.getString("Autor"));
         textDescripcio.setText(bundle.getString("Descripcio"));
+        textDescripcio.setMovementMethod(new ScrollingMovementMethod());
         //strImatge = bundle.getString("ImatgePortada");
         strImatge = pref.getString("ImatgePortada",null);
         byte[] decodedString = Base64.decode(strImatge, Base64.DEFAULT);
@@ -66,7 +69,6 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textIdioma.setText(bundle.getString("Idioma"));
         textISBN.setText(bundle.getString("ISBN"));
 
-        // Definim els listeners
         // Definim els listeners
         btnReserva = ((Button)findViewById(R.id.btnReserva));
         btnReserva.setOnClickListener(this);
@@ -109,5 +111,15 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
                 Toast.makeText(VisualitzarInfoLlibre.this, toast, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Torna a la pantalla de login en cas de prémer el botó "Back"
+     */
+    @Override
+    public void onBackPressed() {
+        // Torna a la pantalla principal
+        startActivity(i);
+        finish();
     }
 }
