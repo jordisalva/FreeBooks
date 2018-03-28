@@ -2,9 +2,11 @@ package ioc.xtec.cat.freebooks;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +44,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     private ProgressBar barra_progres;
     MenuItem searchMenuItem;
     SearchView searchView;
+    SearchManager searchManager;
 
     /**
      * Accions en la creació
@@ -52,6 +55,18 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+
+        BroadcastReceiver broadcast_reciever = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context arg0, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals("finish")) {
+                    finish();
+                }
+            }
+        };
+        registerReceiver(broadcast_reciever, new IntentFilter("finish"));
 
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
@@ -93,14 +108,19 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        SearchManager searchManager = (SearchManager)
+        searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.app_search);
-        searchView = (SearchView) searchMenuItem.getActionView();
+        //searchView = (SearchView) searchMenuItem.getActionView();
+        searchView =
+                (SearchView) menu.findItem(R.id.app_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        //searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
         searchView.setFocusable(true);
-        searchView.setIconified(false);
+        searchView.setIconified(true);
         searchView.requestFocusFromTouch();
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -113,7 +133,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 return false;
             }
         });
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -124,7 +143,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      */
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the Home/Up button, so
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -138,7 +157,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Crea un intent amb la pantalla d'edició d'usuari
             Intent iEditUser = new Intent(PrincipalActivity.this, EditaUsuariActivity.class);
             startActivity(iEditUser);
-            finish();
         } else if (id == R.id.app_logout) {
             // Tanca la sessió
             tancaSessio();

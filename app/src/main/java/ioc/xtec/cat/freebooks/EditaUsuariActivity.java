@@ -48,6 +48,9 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edita_usuari);
 
+        Intent iFinalitza = new Intent("finish");
+        sendBroadcast(iFinalitza);
+
         userText = (EditText) findViewById(R.id.textUsuari);
         userPass = (EditText) findViewById(R.id.textContrasenya);
         userConfirmPass = (EditText) findViewById(R.id.textConfirmaContrasenya);

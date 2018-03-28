@@ -26,6 +26,5 @@
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="400"
         android:title="@string/app_search"
-        app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="collapseActionView|ifRoom" />
+        app:actionViewClass="android.widget.SearchView" />
 </menu>

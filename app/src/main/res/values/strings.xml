@@ -21,6 +21,7 @@
     <string name="app_logout">Logout</string>
     <string name="app_refresh">Refresh</string>
     <string name="app_search">Search</string>
+    <string name="app_editUser">Edit User</string>
     <string name="thumbnail">thumbnail</string>
     <string name="titol_info_llibre">Informació del llibre</string>
     <string name="imatge_llibre">Imatge del llibre</string>
@@ -42,4 +43,5 @@
     <string name="boto_tornar">Tornar</string>
     <string name="titol_edita_usuari">Edició de l\'usuari</string>
     <string name="boto_guardar">Guardar Canvis</string>
+    <string name="action_settings">Settings</string>
 </resources>

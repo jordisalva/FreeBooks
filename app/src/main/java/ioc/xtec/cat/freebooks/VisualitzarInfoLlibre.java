@@ -46,6 +46,9 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         SharedPreferences pref = getSharedPreferences("MyPref", Context.MODE_PRIVATE);
         SharedPreferences.Editor ed = pref.edit();
 
+        Intent iFinalitza = new Intent("finish");
+        sendBroadcast(iFinalitza);
+
         textTitol = (TextView) findViewById(R.id.textTitol);
         textAutor = (TextView) findViewById(R.id.textAutor);
         textDescripcio = (TextView) findViewById(R.id.textDescripcio);
@@ -76,7 +79,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         btnTornar.setOnClickListener(this);
 
         // Crea un intent amb la pantalla de login
-        i = new Intent(this, PrincipalActivity.class);
+        i = new Intent(VisualitzarInfoLlibre.this, PrincipalActivity.class);
 
         ed.remove("ImatgePortada");
         ed.clear();
