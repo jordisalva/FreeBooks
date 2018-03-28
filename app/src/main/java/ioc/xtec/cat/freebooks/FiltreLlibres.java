@@ -29,8 +29,8 @@ public class FiltreLlibres extends Filter {
         FilterResults results=new FilterResults();
 
         String paraulaBuscada = constraint.toString();
-        String titolOnBuscar="";
-        String titolOnBuscarSenseAccents="";
+        String texteOnBuscar="";
+        String texteOnBuscarSenseAccents="";
         boolean trobat = false;
 
         // Guarda els llibres filtrats
@@ -42,12 +42,12 @@ public class FiltreLlibres extends Filter {
 
             for (int i = 0; i < filterList.size(); i++){
                 //Obtenim cada un dels titols de noticies disponibles a la bdd
-                titolOnBuscar = filterList.get(i).titol;
-                titolOnBuscarSenseAccents = Normalizer.normalize(titolOnBuscar, Normalizer.Form.NFD)
+                texteOnBuscar = filterList.get(i).titol + " " + filterList.get(i).autor;
+                texteOnBuscarSenseAccents = Normalizer.normalize(texteOnBuscar, Normalizer.Form.NFD)
                         .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                 Pattern regex = Pattern.compile("\\b" + Pattern.quote(paraulaBuscada), Pattern.CASE_INSENSITIVE);
-                Matcher match = regex.matcher(titolOnBuscar);
-                Matcher matchSenseAccents = regex.matcher(titolOnBuscarSenseAccents);
+                Matcher match = regex.matcher(texteOnBuscar);
+                Matcher matchSenseAccents = regex.matcher(texteOnBuscarSenseAccents);
                 //Si hi ha alguna cooincidencia tan si te accents/majúcules/mínuscules que començi per la paraula buscada
                 if(match.find() || matchSenseAccents.find()){
                     trobat = true;
