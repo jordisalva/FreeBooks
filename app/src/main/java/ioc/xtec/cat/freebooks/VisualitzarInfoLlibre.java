@@ -20,6 +20,7 @@ import android.widget.Toast;
  */
 
 public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnClickListener {
+    public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     // Variables per les dades del llibre
     String strImatge;
     TextView textTitol;
@@ -96,6 +97,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         if (v == btnReserva) {
             showToast("Estarà disponible al TEA4!");
         } else if (v == btnTornar) {
+            String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+            i.putExtra(EXTRA_MESSAGE,extra);
             startActivity(i);
             finish();
         }
@@ -122,6 +125,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     @Override
     public void onBackPressed() {
         // Torna a la pantalla principal
+        String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+        i.putExtra(EXTRA_MESSAGE,extra);
         startActivity(i);
         finish();
     }

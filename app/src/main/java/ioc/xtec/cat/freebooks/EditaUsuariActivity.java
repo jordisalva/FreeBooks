@@ -1,33 +1,16 @@
 package ioc.xtec.cat.freebooks;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 public class EditaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String SEPARADOR = "Sep@!-@rad0R";
+    public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
     // Variables dels botons
     Button botoGuardar, botoCancelar;
@@ -104,13 +87,17 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                         e.printStackTrace();
                     }
                     // Torna a guardar les dades des sessió per si s'ha modificat l'usuari
-                    guardarSessio();
+
                     showToast("Dades guardades correctament");
+                    String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+                    i.putExtra(EXTRA_MESSAGE,extra);
                     startActivity(i);
                     finish();
                 }
             }
         } else {
+            String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+            i.putExtra(EXTRA_MESSAGE,extra);
             startActivity(i);
             finish();
         }
@@ -123,6 +110,8 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+        i.putExtra(EXTRA_MESSAGE,extra);
         startActivity(i);
         finish();
     }
@@ -132,7 +121,8 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
      */
     public void ompleDadesUsuari() {
         try {               // TODO MILLORAR EL CODI
-            final String checkLogin = "userIsLogged" + SEPARADOR + ObtainUserType();
+            final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
             final ConnexioServidor connexioServidor = new ConnexioServidor();
             Thread thread = new Thread(new Runnable() {
                 public void run() {
@@ -142,8 +132,8 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                             String llistaLogs = connexioServidor2.consulta("getLogins");
                             String[] usuaris = llistaLogs.split("~");
                             for (String usr : usuaris) {
-                                if (usr.split(SEPARADOR)[0].equals(ObtainUserType().split(SEPARADOR)[0])
-                                        && usr.split(SEPARADOR)[2].equals(ObtainUserType().split(SEPARADOR)[1])) {
+                                if (usr.split(SEPARADOR)[0].equals(extra.split(SEPARADOR)[0])
+                                        && usr.split(SEPARADOR)[2].equals(extra.split(SEPARADOR)[1])) {
                                     userText.setText(usr.split(SEPARADOR)[0]);
                                     userPass.setText(usr.split(SEPARADOR)[1]);
                                     userConfirmPass.setText(usr.split(SEPARADOR)[1]);
@@ -169,16 +159,18 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
      */
     public void guardaDadesUsuari() {
         try {               // TODO MILLORAR EL CODI
-            final String checkLogin = "userIsLogged" + SEPARADOR + ObtainUserType();
-            final ConnexioServidor connexioServidor = new ConnexioServidor();
+            final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
+
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
+                        ConnexioServidor connexioServidor = new ConnexioServidor();
                         if (connexioServidor.consulta(checkLogin).equals("OK")) {
-                            String req = "editLoginMyLogin" + "Sep@!-@rad0R" + ObtainUserType().split("Sep@!-@rad0R")[0]
-                                    + "Sep@!-@rad0R" + ObtainUserType().split("Sep@!-@rad0R")[1] + "Sep@!-@rad0R"
+                            String req = "editLoginMyLogin" + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[0]
+                                    + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[1] + "Sep@!-@rad0R"
                                     + userText.getText() + "Sep@!-@rad0R" + userPass.getText() + "Sep@!-@rad0R" + userEmail.getText();
-                            connexioServidor.consulta(req);
+                            String res = connexioServidor.consulta(req);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -191,91 +183,6 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
             System.out.println(e.getMessage());
         }
 
-    }
-
-    /**
-     * Obté les dades de l'usuari
-     *
-     * @return Un string amb les dades de l'usuari
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     */
-    public String ObtainUserType() throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        String res;
-        KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-        byte[] bytesClau = Files.readAllBytes(new File(Environment.getExternalStorageDirectory().toString() + "/Freebooks/ClauS").toPath());
-        SecretKey myKey = new SecretKeySpec(bytesClau, "DES");
-        Cipher desCipher;
-        desCipher = Cipher.getInstance("DES");
-        desCipher.init(Cipher.DECRYPT_MODE, myKey);
-        byte[] textEncrypted = fitxerEnBytes(new File(Environment.getExternalStorageDirectory().toString() + "/Freebooks/Usuari"));
-        byte[] textDecrypted = desCipher.doFinal(textEncrypted);
-        String s = new String(textDecrypted);
-        res = s;
-        return res;
-    }
-
-    /**
-     * Se li passa com a paràmetre un fixer i retorna un fitxer en bytes
-     *
-     * @param f amb el fitxer
-     * @return El fitxer en bytes
-     * @throws IOException
-     */
-    private byte[] fitxerEnBytes(File f) throws IOException {
-        byte[] fbytes;
-        try (FileInputStream fis = new FileInputStream(f)) {
-            fbytes = new byte[(int) f.length()];
-            fis.read(fbytes);
-        }
-        return fbytes;
-    }
-
-    public void guardarSessio() {
-        final Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    try {
-                        String message = userText.getText() + "Sep@!-@rad0R" + "Mobile";
-
-                        KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-                        SecretKey myKey = keyGen.generateKey();
-                        Cipher desCipher;
-                        desCipher = Cipher.getInstance("DES");
-                        String userToEncrypt = message;
-                        byte[] user = userToEncrypt.getBytes("UTF8");
-                        desCipher.init(Cipher.ENCRYPT_MODE, myKey);
-                        byte[] userEncrypted = desCipher.doFinal(user);
-                        //Crea el directori Freebooks en cas de no existir
-                        File directori = new File(Environment.getExternalStorageDirectory().toString() + "/Freebooks/");
-                        if (!directori.exists()) {
-                            directori.mkdir();
-                        }
-                        try (FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/FreeBooks/Usuari")) {
-                            fos.write(userEncrypted);
-                            fos.flush();
-                        }
-                        try (FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/FreeBooks/ClauS")) {
-                            fos.write(myKey.getEncoded());
-                            fos.flush();
-                        }
-
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
     }
 
     /**

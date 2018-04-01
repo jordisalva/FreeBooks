@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> implements Filterable {
 
+    public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
     public ArrayList<Llibre> items, filterList;
     private Context context;
@@ -99,6 +100,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 intent.putExtra("NumPagines", items.get(position).numPags);
                 intent.putExtra("Idioma", items.get(position).idioma);
                 intent.putExtra("ISBN", items.get(position).ISBN);
+                final String extra = ((PrincipalActivity)context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                intent.putExtra(EXTRA_MESSAGE,extra);
                 context.startActivity(intent);
             }
         });

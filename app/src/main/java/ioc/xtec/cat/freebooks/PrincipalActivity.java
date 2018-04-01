@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +26,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
     public static final String SEPARADOR = "Sep@!-@rad0R";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
+    public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
 
     // Variable del botó logout
@@ -66,7 +66,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 }
             }
         };
-        registerReceiver(broadcast_reciever, new IntentFilter("finish"));
+        //registerReceiver(broadcast_reciever, new IntentFilter("finish"));
 
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
@@ -155,7 +155,9 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Edita l'usuari
 
             // Crea un intent amb la pantalla d'edició d'usuari
+            String extrasMessage = getIntent().getStringExtra(EXTRA_MESSAGE);
             Intent iEditUser = new Intent(PrincipalActivity.this, EditaUsuariActivity.class);
+            iEditUser.putExtra(EXTRA_MESSAGE,extrasMessage);
             startActivity(iEditUser);
         } else if (id == R.id.app_logout) {
             // Tanca la sessió
@@ -219,13 +221,18 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                             @Override
                             public void run() {
                                 ConnexioServidor connexioServidor = new ConnexioServidor();
-                                String codiRequest = "userLogout";
-                                String resposta = connexioServidor.consulta(codiRequest);
-                                if (resposta.equals("OK")) {
-                                    showToast("Sessió tancada correctament");
+                                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+                                String resposta = connexioServidor.consulta(checkLogin);
+                                if(resposta.equals("OK")){
+                                    String codiRequest = "userLogout" +SEPARADOR+ extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+                                    String resposta2 = connexioServidor.consulta(codiRequest);
+                                    if (resposta2.equals("OK")) {
+                                        showToast("Sessió tancada correctament");
+                                    }
+                                    startActivity(i);
+                                    finish();
                                 }
-                                startActivity(i);
-                                finish();
                             }
                         });
                         thread.start();
@@ -267,43 +274,49 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             llistaLlibres.clear();
             // Realitzem la connexió amb el servidor
             ConnexioServidor connexioServidor = new ConnexioServidor();
-            // El servidor retorna la llista de llibres en un string
-            String llistaBooks = connexioServidor.consulta("getBooks");
-            // Si la llista no és buida carreguem els llibres
-            if (!llistaBooks.isEmpty()) {
-                String[] llibresArray = llistaBooks.split("~");
-                int midaArray = llibresArray.length;
-                // Recorrem l'array de llibres
-                for (int i = 0; i < midaArray; i++) {
-                    System.out.println("LLibre: " + i);
-                    String img = llibresArray[i].split(SEPARADOR)[3];
-                    /**
-                     * Mentres no coincideixi la mida de l'imatge, amb la mida real de l'imatge
-                     * que ens passa el servidor, tornarem realitzar la connexió per baixar de nou
-                     * les dades
-                     */
-                    while (img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1])) {
-                        System.out.println("llargada NO OK: " + img.length());
-                        // Tornem a realizar la connexió
-                        llistaBooks = connexioServidor.consulta("getBooks");
-                        llibresArray = llistaBooks.split("~");
-                        img = llibresArray[i].split(SEPARADOR)[3];
+            //Primer revisem si l'usuari està logat
+            String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+            String resposta = connexioServidor.consulta(checkLogin);
+            if(resposta.equals("OK")){
+                // El servidor retorna la llista de llibres en un string
+                String llistaBooks = connexioServidor.consulta("getBooks");
+                // Si la llista no és buida carreguem els llibres
+                if (!llistaBooks.isEmpty()) {
+                    String[] llibresArray = llistaBooks.split("~");
+                    int midaArray = llibresArray.length;
+                    // Recorrem l'array de llibres
+                    for (int i = 0; i < midaArray; i++) {
+                        System.out.println("LLibre: " + i);
+                        String img = llibresArray[i].split(SEPARADOR)[3];
+                        /**
+                         * Mentres no coincideixi la mida de l'imatge, amb la mida real de l'imatge
+                         * que ens passa el servidor, tornarem realitzar la connexió per baixar de nou
+                         * les dades
+                         */
+                        while (img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1])) {
+                            System.out.println("llargada NO OK: " + img.length());
+                            // Tornem a realizar la connexió
+                            llistaBooks = connexioServidor.consulta("getBooks");
+                            llibresArray = llistaBooks.split("~");
+                            img = llibresArray[i].split(SEPARADOR)[3];
+                        }
+                        System.out.println("llargada OK: " + img.length());
+                        llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
+                                llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
+                                llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
                     }
-                    System.out.println("llargada OK: " + img.length());
-                    llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
-                            llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
-                            llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
-                }
 
-                // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-            } else {
-                showToast("No hi ha llibres a la base de dades");
+                } else {
+                    showToast("No hi ha llibres a la base de dades");
+                }
             }
 
             return null;
