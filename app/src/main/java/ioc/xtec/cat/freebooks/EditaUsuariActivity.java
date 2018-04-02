@@ -143,7 +143,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                             String llistaLogs = "getLogins";
                             try {
                                 codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
-                                llistaLogs = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                llistaLogs = desencriptaDades(connexioServidor2.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -180,15 +180,17 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
             final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
 
+
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
                         ConnexioServidor connexioServidor = new ConnexioServidor();
-                        if (connexioServidor.consulta(checkLogin).equals("OK")) {
+                        if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             String req = "editLoginMyLogin" + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[0]
                                     + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[1] + "Sep@!-@rad0R"
                                     + userText.getText() + "Sep@!-@rad0R" + userPass.getText() + "Sep@!-@rad0R" + userEmail.getText();
-                            String codiRequestXifrat = encriptaDades(req, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            codiRequestXifrat = encriptaDades(req, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
                             String res = connexioServidor.consulta(codiRequestXifrat);
                         }
                     } catch (Exception e) {
