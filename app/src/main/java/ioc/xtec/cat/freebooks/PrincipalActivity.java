@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public static final String SEPARADOR = "Sep@!-@rad0R";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
+    BroadcastReceiver broadcast_reciever;
 
 
     // Variable del botó logout
@@ -63,7 +65,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
-        BroadcastReceiver broadcast_reciever = new BroadcastReceiver() {
+        broadcast_reciever = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context arg0, Intent intent) {
@@ -73,7 +75,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 }
             }
         };
-        //registerReceiver(broadcast_reciever, new IntentFilter("finish"));
+        registerReceiver(broadcast_reciever, new IntentFilter("finish"));
 
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
@@ -391,5 +393,13 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             barra_progres.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    protected void onStop()
+    {
+        unregisterReceiver(broadcast_reciever);
+        super.onStop();
+    }
+
 
 }
