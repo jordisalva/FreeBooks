@@ -8,6 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
+
 public class AltaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Variables dels botons
@@ -93,6 +99,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
      * Dona d'alta l'usuari amb totes les dades introduïdes
      */
     public void altaUsuari() {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
         final String codiRequest = "nouLogin"+"Sep@!-@rad0R"+userText.getText()+"Sep@!-@rad0R"+userPass.getText()+"Sep@!-@rad0R"+"Mobile"+"Sep@!-@rad0R"+userEmail.getText();
         Thread thread = new Thread(new Runnable() {
 
@@ -100,7 +107,8 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
             public void run() {
                 try  {
                     ConnexioServidor connexioServidor = new ConnexioServidor();
-                    resposta = connexioServidor.consulta(codiRequest);
+                    String codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
                     if(resposta.equals("OK")){
                         showToast("Usuari Creat");
                         startActivity(i);

@@ -22,6 +22,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static ioc.xtec.cat.freebooks.CriptoUtils.desencriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
+
 public class PrincipalActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String SEPARADOR = "Sep@!-@rad0R";
@@ -203,6 +210,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      * Tanca la sessió activa i torna a la pantalla de login
      */
     public void tancaSessio() {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
         // Crea un missatge d'alerta
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 PrincipalActivity.this);
@@ -220,13 +228,24 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
                             @Override
                             public void run() {
+                                String codiRequestXifrat="";
                                 ConnexioServidor connexioServidor = new ConnexioServidor();
                                 String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
                                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
-                                String resposta = connexioServidor.consulta(checkLogin);
+                                try {
+                                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                String resposta = connexioServidor.consulta(codiRequestXifrat);
                                 if(resposta.equals("OK")){
                                     String codiRequest = "userLogout" +SEPARADOR+ extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
-                                    String resposta2 = connexioServidor.consulta(codiRequest);
+                                    try {
+                                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    String resposta2 = connexioServidor.consulta(codiRequestXifrat);
                                     if (resposta2.equals("OK")) {
                                         showToast("Sessió tancada correctament");
                                     }
@@ -269,6 +288,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      * d'entrada, actualitza el progrés amb Integers i no retorna res
      */
     private class CarregaLlibres extends AsyncTask<Void, Integer, String> {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+        String codiRequestXifrat="";
         protected String doInBackground(Void... voids) {
             // Borrem la llista antiga de llibres
             llistaLlibres.clear();
@@ -277,10 +298,21 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             //Primer revisem si l'usuari està logat
             String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
             String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
-            String resposta = connexioServidor.consulta(checkLogin);
+            try {
+                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String resposta = connexioServidor.consulta(codiRequestXifrat);
             if(resposta.equals("OK")){
                 // El servidor retorna la llista de llibres en un string
-                String llistaBooks = connexioServidor.consulta("getBooks");
+                String llistaBooks = "getBooks";
+                try {
+                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                    llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 // Si la llista no és buida carreguem els llibres
                 if (!llistaBooks.isEmpty()) {
                     String[] llibresArray = llistaBooks.split("~");
@@ -297,7 +329,14 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                         while (img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1])) {
                             System.out.println("llargada NO OK: " + img.length());
                             // Tornem a realizar la connexió
-                            llistaBooks = connexioServidor.consulta("getBooks");
+
+                            llistaBooks = "getBooks";
+                            try {
+                                codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                             llibresArray = llistaBooks.split("~");
                             img = llibresArray[i].split(SEPARADOR)[3];
                         }

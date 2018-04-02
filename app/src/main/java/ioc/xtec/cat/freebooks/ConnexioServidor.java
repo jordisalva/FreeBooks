@@ -36,7 +36,6 @@ public class ConnexioServidor {
                         new InputStreamReader(socket.getInputStream()))) {
                     resposta = lector.readLine();
                 }
-
             }
             socket.close();
         } catch (Exception e){

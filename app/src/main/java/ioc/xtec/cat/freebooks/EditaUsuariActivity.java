@@ -1,4 +1,5 @@
 package ioc.xtec.cat.freebooks;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +7,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static ioc.xtec.cat.freebooks.CriptoUtils.desencriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
 public class EditaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -120,16 +128,25 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
      * Omple les dades de l'usuari actual
      */
     public void ompleDadesUsuari() {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+
         try {               // TODO MILLORAR EL CODI
             final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
-            final ConnexioServidor connexioServidor = new ConnexioServidor();
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        if (connexioServidor.consulta(checkLogin).equals("OK")) {
+                        ConnexioServidor connexioServidor = new ConnexioServidor();
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                        if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             ConnexioServidor connexioServidor2 = new ConnexioServidor();
-                            String llistaLogs = connexioServidor2.consulta("getLogins");
+                            String llistaLogs = "getLogins";
+                            try {
+                                codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                llistaLogs = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                             String[] usuaris = llistaLogs.split("~");
                             for (String usr : usuaris) {
                                 if (usr.split(SEPARADOR)[0].equals(extra.split(SEPARADOR)[0])
@@ -158,6 +175,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
      * Omple les dades de l'usuari actual
      */
     public void guardaDadesUsuari() {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
         try {               // TODO MILLORAR EL CODI
             final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
@@ -170,7 +188,8 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                             String req = "editLoginMyLogin" + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[0]
                                     + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[1] + "Sep@!-@rad0R"
                                     + userText.getText() + "Sep@!-@rad0R" + userPass.getText() + "Sep@!-@rad0R" + userEmail.getText();
-                            String res = connexioServidor.consulta(req);
+                            String codiRequestXifrat = encriptaDades(req, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            String res = connexioServidor.consulta(codiRequestXifrat);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

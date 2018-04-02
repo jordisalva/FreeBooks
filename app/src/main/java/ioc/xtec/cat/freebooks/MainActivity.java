@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +13,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -127,50 +125,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Si es correcte inicia sessió, en cas contrari mostrarà missatges indicant l'error
      */
     public void iniciarSessio() {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+
         // Obté les dades de login introduïdes per l'usuari
         final String usuariIntroduit = textUsuari.getText().toString();
         final String passIntroduit = textContrasenya.getText().toString();
 
         final String codiRequest = "userLogin"+"Sep@!-@rad0R"+usuariIntroduit +"Sep@!-@rad0R"+passIntroduit+"Sep@!-@rad0R"+"Mobile";
+
+
         final Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
+                String codiRequestXifrat="";
                 try  {
                     try {
                         if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
                             showToast("Falten dades");
                         } else {
                             ConnexioServidor connexioServidor = new ConnexioServidor();
-                            codiSessio = connexioServidor.consulta(codiRequest);
+                            codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            codiSessio = connexioServidor.consulta(codiRequestXifrat);
                             if(codiSessio.equals("FAIL")){
                                 showToast("Usuari o contrasenya invàlids");
                             }else if (codiSessio.startsWith("OK")){
                                 String message = usuariIntroduit +"Sep@!-@rad0R"+"Mobile";
                                 showToast("Usuari i contrasenya vàlids");
-
-                                KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-                                SecretKey myKey = keyGen.generateKey();
-                                Cipher desCipher;
-                                desCipher = Cipher.getInstance("DES");
-                                String userToEncrypt = message;
-                                byte [] user = userToEncrypt.getBytes("UTF8");
-                                desCipher.init(Cipher.ENCRYPT_MODE, myKey);
-                                byte[] userEncrypted = desCipher.doFinal(user);
-                                //Crea el directori Freebooks en cas de no existir
-                                File directori = new File(Environment.getExternalStorageDirectory().toString() + "/Freebooks/");
-                                if (!directori.exists()) {
-                                    directori.mkdir();
-                                }
-                                try (FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/FreeBooks/Usuari")) {
-                                    fos.write(userEncrypted);
-                                    fos.flush();
-                                }
-                                try (FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/FreeBooks/ClauS")) {
-                                    fos.write(myKey.getEncoded());
-                                    fos.flush();
-                                }
-
                                 Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
                                 i.putExtra(EXTRA_MESSAGE,message);
                                 startActivity(i);
