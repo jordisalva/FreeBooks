@@ -36,6 +36,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
+
     // Variable del botó logout
     Button botoLogout;
 
@@ -53,7 +54,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     SearchView searchView;
     SearchManager searchManager;
     BroadcastReceiver broadcast_reciever;
-    String errorDesencriptar;
 
     /**
      * Accions en la creació
@@ -349,12 +349,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                             // Tornem a realizar la connexió
 
                             llistaBooks = "getBooks";
-                            errorDesencriptar =  "error";
                             try {
                                 codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                while (llistaBooks.equals("error")) {
+                                while (llistaBooks.equals("getBooks")) {
                                     try {
-                                        errorDesencriptar = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                        llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                                     } catch (Exception ex) {
                                         ex.printStackTrace();
                                     }
