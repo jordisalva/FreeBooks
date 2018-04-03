@@ -36,7 +36,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
-
     // Variable del botó logout
     Button botoLogout;
 
