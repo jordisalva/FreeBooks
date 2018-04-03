@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     MenuItem searchMenuItem;
     SearchView searchView;
     SearchManager searchManager;
+    BroadcastReceiver broadcast_reciever;
+    String errorDesencriptar;
 
     /**
      * Accions en la creació
@@ -63,7 +66,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
-        BroadcastReceiver broadcast_reciever = new BroadcastReceiver() {
+        broadcast_reciever = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context arg0, Intent intent) {
@@ -73,7 +76,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 }
             }
         };
-        //registerReceiver(broadcast_reciever, new IntentFilter("finish"));
+        registerReceiver(broadcast_reciever, new IntentFilter("finish"));
 
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
@@ -164,7 +167,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Crea un intent amb la pantalla d'edició d'usuari
             String extrasMessage = getIntent().getStringExtra(EXTRA_MESSAGE);
             Intent iEditUser = new Intent(PrincipalActivity.this, EditaUsuariActivity.class);
-            iEditUser.putExtra(EXTRA_MESSAGE,extrasMessage);
+            iEditUser.putExtra(EXTRA_MESSAGE, extrasMessage);
             startActivity(iEditUser);
         } else if (id == R.id.app_logout) {
             // Tanca la sessió
@@ -178,8 +181,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Mostrem la barra de progrés
             barra_progres.setVisibility(View.VISIBLE);
 
-            // Executem la tasca per carregar els llibres
             new CarregaLlibres().execute((Void) null);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -192,9 +195,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      */
     @Override
     public void onClick(View v) {
-        /**if (v == botoLogout) {
-         tancaSessio();
-         }**/
+
     }
 
     /**
@@ -228,20 +229,20 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
                             @Override
                             public void run() {
-                                String codiRequestXifrat="";
+                                String codiRequestXifrat = "";
                                 ConnexioServidor connexioServidor = new ConnexioServidor();
                                 String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
-                                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+                                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                 try {
-                                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                                 String resposta = connexioServidor.consulta(codiRequestXifrat);
-                                if(resposta.equals("OK")){
-                                    String codiRequest = "userLogout" +SEPARADOR+ extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+                                if (resposta.equals("OK")) {
+                                    String codiRequest = "userLogout" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                     try {
-                                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -289,7 +290,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      */
     private class CarregaLlibres extends AsyncTask<Void, Integer, String> {
         final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-        String codiRequestXifrat="";
+        String codiRequestXifrat = "";
+
         protected String doInBackground(Void... voids) {
             // Borrem la llista antiga de llibres
             llistaLlibres.clear();
@@ -297,19 +299,25 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             ConnexioServidor connexioServidor = new ConnexioServidor();
             //Primer revisem si l'usuari està logat
             String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
-            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0]+SEPARADOR+extras.split(SEPARADOR)[1];
+            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
             try {
-                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
             } catch (Exception e) {
                 e.printStackTrace();
             }
             String resposta = connexioServidor.consulta(codiRequestXifrat);
-            if(resposta.equals("OK")){
+            if (resposta.equals("OK")) {
                 // El servidor retorna la llista de llibres en un string
                 String llistaBooks = "getBooks";
                 try {
-                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
-                    llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                    while (llistaBooks.equals("getBooks")) {
+                        try {
+                            llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -319,21 +327,40 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                     int midaArray = llibresArray.length;
                     // Recorrem l'array de llibres
                     for (int i = 0; i < midaArray; i++) {
+                        String img = "";
                         System.out.println("LLibre: " + i);
-                        String img = llibresArray[i].split(SEPARADOR)[3];
+                        try {
+                            img = llibresArray[i].split(SEPARADOR)[3];
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                         /**
                          * Mentres no coincideixi la mida de l'imatge, amb la mida real de l'imatge
                          * que ens passa el servidor, tornarem realitzar la connexió per baixar de nou
                          * les dades
                          */
-                        while (img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1])) {
+                        Boolean tamanyIncorrecte = false;
+                        try {
+                            tamanyIncorrecte = img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1]);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        while (tamanyIncorrecte) {
                             System.out.println("llargada NO OK: " + img.length());
                             // Tornem a realizar la connexió
 
                             llistaBooks = "getBooks";
+                            errorDesencriptar =  "error";
                             try {
-                                codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
-                                llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                while (llistaBooks.equals("error")) {
+                                    try {
+                                        errorDesencriptar = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -341,12 +368,18 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                             img = llibresArray[i].split(SEPARADOR)[3];
                         }
                         System.out.println("llargada OK: " + img.length());
-                        llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
-                                llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
-                                llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
+                        try {
+                            llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
+                                    llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
+                                    llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
                     }
 
-                    // Temporal perquè va massa ràpid a carregar les imatges i no es veu la barra de progrés
+                    // Va massa ràpid a carregar les imatges i no es veu la barra de progrés
+                    // Li afegim un segon de retard perqué és vegi sempre
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -391,5 +424,12 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             barra_progres.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(broadcast_reciever);
+        super.onStop();
+    }
+
 
 }
