@@ -57,7 +57,7 @@ public class CriptoUtils {
             cipher.init(Cipher.DECRYPT_MODE, clauSecreta);
             decryptedData = cipher.doFinal(data);
         } catch (Exception e){
-            System.err.println("Error xifrant les dades " + e);
+            System.err.println("Error desxifrant les dades " + e);
         }
         //escriuAFitxer(fitxerDesencriptat, decryptedData);
         res = new String(decryptedData);

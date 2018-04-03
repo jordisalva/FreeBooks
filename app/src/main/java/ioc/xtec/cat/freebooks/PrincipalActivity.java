@@ -310,11 +310,12 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 String llistaBooks = "getBooks";
                 try {
                     codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                    // Anirem fent connexions al servidor demanant la llista de llibres, fins que aquesta es pugui desencriptar correctament
                     while (llistaBooks.equals("getBooks")) {
                         try {
                             llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            System.err.println("Error al desencriptar " + ex);
                         }
                     }
                 } catch (Exception ex) {
@@ -326,46 +327,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                     int midaArray = llibresArray.length;
                     // Recorrem l'array de llibres
                     for (int i = 0; i < midaArray; i++) {
-                        String img = "";
-                        System.out.println("LLibre: " + i);
-                        try {
-                            img = llibresArray[i].split(SEPARADOR)[3];
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                        /**
-                         * Mentres no coincideixi la mida de l'imatge, amb la mida real de l'imatge
-                         * que ens passa el servidor, tornarem realitzar la connexió per baixar de nou
-                         * les dades
-                         */
-                        Boolean tamanyIncorrecte = false;
-                        try {
-                            tamanyIncorrecte = img.split(SEPARADOR_IMATGE)[0].length() != Integer.parseInt(img.split(SEPARADOR_IMATGE)[1]);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                        while (tamanyIncorrecte) {
-                            System.out.println("llargada NO OK: " + img.length());
-                            // Tornem a realizar la connexió
-
-                            llistaBooks = "getBooks";
-                            try {
-                                codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                while (llistaBooks.equals("getBooks")) {
-                                    try {
-                                        llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-                                }
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                            llibresArray = llistaBooks.split("~");
-                            img = llibresArray[i].split(SEPARADOR)[3];
-                        }
-                        System.out.println("llargada OK: " + img.length());
                         try {
                             llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
                                     llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
