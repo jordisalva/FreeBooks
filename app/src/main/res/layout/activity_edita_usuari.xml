@@ -16,9 +16,9 @@
         android:id="@+id/imageAddUser"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginStart="276dp"
+        android:layout_marginStart="260dp"
         android:contentDescription="@string/imageAddUser"
-        android:src="@drawable/adduser"
+        android:src="@drawable/edituser"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

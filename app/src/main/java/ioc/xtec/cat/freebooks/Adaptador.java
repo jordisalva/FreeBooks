@@ -110,11 +110,12 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                /**
                 //Borrem el llibre de la llista visualitzada(no de les dades guardades)
                 items.remove(position);
                 //Notifiquem el canvi
                 notifyItemRemoved(position);
-                notifyItemRangeChanged(position, items.size());
+                notifyItemRangeChanged(position, items.size());**/
                 return true;
             }
         });

@@ -89,23 +89,16 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    try {
-                        Thread.sleep(500);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    // Torna a guardar les dades des sessió per si s'ha modificat l'usuari
-
-                    showToast("Dades guardades correctament");
-                    String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-                    i.putExtra(EXTRA_MESSAGE,extra);
-                    startActivity(i);
-                    finish();
+                    /**try {
+                     Thread.sleep(500);
+                     } catch (Exception e) {
+                     e.printStackTrace();
+                     }**/
                 }
             }
         } else {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-            i.putExtra(EXTRA_MESSAGE,extra);
+            i.putExtra(EXTRA_MESSAGE, extra);
             startActivity(i);
             finish();
         }
@@ -119,7 +112,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
     public void onBackPressed() {
         super.onBackPressed();
         String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-        i.putExtra(EXTRA_MESSAGE,extra);
+        i.putExtra(EXTRA_MESSAGE, extra);
         startActivity(i);
         finish();
     }
@@ -130,20 +123,20 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
     public void ompleDadesUsuari() {
         final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
 
-        try {               // TODO MILLORAR EL CODI
+        try {
             final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
+            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0] + SEPARADOR + extra.split(SEPARADOR)[1];
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
                         ConnexioServidor connexioServidor = new ConnexioServidor();
-                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             ConnexioServidor connexioServidor2 = new ConnexioServidor();
                             String llistaLogs = "getLogins";
                             try {
-                                codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
-                                llistaLogs = desencriptaDades(connexioServidor2.consulta(codiRequestXifrat),(SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                                codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                llistaLogs = desencriptaDades(connexioServidor2.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -172,26 +165,38 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * Omple les dades de l'usuari actual
+     * Guarda les dades de l'usuari actual i torna a la pantalla principal
      */
     public void guardaDadesUsuari() {
         final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-        try {               // TODO MILLORAR EL CODI
+        try {
             final String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0]+SEPARADOR+extra.split(SEPARADOR)[1];
-
+            final String checkLogin = "userIsLogged" + SEPARADOR + extra.split(SEPARADOR)[0] + SEPARADOR + extra.split(SEPARADOR)[1];
 
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                         ConnexioServidor connexioServidor = new ConnexioServidor();
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
-                            String req = "editLoginMyLogin" + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[0]
-                                    + "Sep@!-@rad0R" + extra.split("Sep@!-@rad0R")[1] + "Sep@!-@rad0R"
-                                    + userText.getText() + "Sep@!-@rad0R" + userPass.getText() + "Sep@!-@rad0R" + userEmail.getText();
-                            codiRequestXifrat = encriptaDades(req, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            String req = "editLoginMyLogin" + SEPARADOR + extra.split(SEPARADOR)[0]
+                                    + SEPARADOR + extra.split(SEPARADOR)[1] + SEPARADOR
+                                    + userText.getText() + SEPARADOR + userPass.getText() + SEPARADOR + userEmail.getText();
+                            codiRequestXifrat = encriptaDades(req, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                             String res = connexioServidor.consulta(codiRequestXifrat);
+                            if (res.equals("OK")) {
+                                showToast("Dades guardades correctament");
+                                //String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
+                                String extra = userText.getText() + "Sep@!-@rad0R" + "Mobile";
+                                i.putExtra(EXTRA_MESSAGE, extra);
+                                startActivity(i);
+                                finish();
+
+                            } else if (res.equals("FAILUSEREXISTS")) {
+                                showToast("L'usuari ja existeix");
+                            } else {
+                                showToast("No s'han pogut actualitzar les dades");
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

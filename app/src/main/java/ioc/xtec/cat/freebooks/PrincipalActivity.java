@@ -234,16 +234,16 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                 try {
                                     codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                } catch (Exception ex) {
+                                    System.err.println("Error al encriptar: " + ex);
                                 }
                                 String resposta = connexioServidor.consulta(codiRequestXifrat);
                                 if (resposta.equals("OK")) {
                                     String codiRequest = "userLogout" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                     try {
-                                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                        codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                    } catch (Exception ex) {
+                                        System.err.println("Error al encriptar: " + ex);
                                     }
                                     String resposta2 = connexioServidor.consulta(codiRequestXifrat);
                                     if (resposta2.equals("OK")) {
@@ -301,8 +301,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
             try {
                 codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                System.err.println("Error al encriptar: " + ex);
             }
             String resposta = connexioServidor.consulta(codiRequestXifrat);
             if (resposta.equals("OK")) {
@@ -315,11 +315,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                         try {
                             llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
                         } catch (Exception ex) {
-                            System.err.println("Error al desencriptar " + ex);
+                            System.err.println("Error al desencriptar: " + ex);
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    System.err.println("Error al encriptar: " + ex);
                 }
                 // Si la llista no és buida carreguem els llibres
                 if (!llistaBooks.isEmpty()) {
@@ -332,7 +332,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                     llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
                                     llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            System.err.println("Error al afegir llibre:  " + ex);
                         }
 
                     }
