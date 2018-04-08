@@ -13,7 +13,7 @@
         android:id="@+id/app_editUser"
         android:icon="@android:drawable/ic_menu_edit"
         android:orderInCategory="200"
-        android:title="@string/app_logout"
+        android:title="@string/app_editUser"
         app:showAsAction="always" />
     <item
         android:id="@+id/app_refresh"

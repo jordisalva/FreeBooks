@@ -22,7 +22,8 @@ import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int PERMISSION = 0;
-
+    public static final String SEPARADOR = "Sep@!-@rad0R";
+    public static final String ALGORISME = "AES/ECB/PKCS5Padding";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
     Context c;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.INTERNET
-            },PERMISSION);
+            }, PERMISSION);
 
         } catch (SecurityException se) {
             se.printStackTrace();
@@ -81,16 +82,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //showToast("S'han donat els permisos");
 
                     // Definim els listeners
-                    botoInici = ((Button)findViewById(R.id.buttonIniciarSessio));
+                    botoInici = ((Button) findViewById(R.id.buttonIniciarSessio));
                     botoInici.setOnClickListener(this);
-                    botoAlta = ((Button)findViewById(R.id.buttonDonarAlta));
+                    botoAlta = ((Button) findViewById(R.id.buttonDonarAlta));
                     botoAlta.setOnClickListener(this);
-                    botoSortir = ((Button)findViewById(R.id.buttonSortir));
+                    botoSortir = ((Button) findViewById(R.id.buttonSortir));
                     botoSortir.setOnClickListener(this);
 
-                    textUsuari = ((TextView)findViewById(R.id.textUsuari));
-                    textContrasenya = ((TextView)findViewById(R.id.textContrasenya));
-                    missatge = ((TextView)findViewById(R.id.missatge));
+                    textUsuari = ((TextView) findViewById(R.id.textUsuari));
+                    textContrasenya = ((TextView) findViewById(R.id.textContrasenya));
+                    missatge = ((TextView) findViewById(R.id.missatge));
                 } else {
                     finish();
                     showToast("No s'han donat els permisos, torna a inciar l'app...");
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         //  Mirem en quin botó ha fet click l'usuari
-        if(v == botoInici) {
+        if (v == botoInici) {
             // Crida per iniciar la sessió
             iniciarSessio();
         } else if (v == botoAlta) {
@@ -131,32 +132,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final String usuariIntroduit = textUsuari.getText().toString();
         final String passIntroduit = textContrasenya.getText().toString();
 
-        final String codiRequest = "userLogin"+"Sep@!-@rad0R"+usuariIntroduit +"Sep@!-@rad0R"+passIntroduit+"Sep@!-@rad0R"+"Mobile";
+        final String codiRequest = "userLogin" + SEPARADOR + usuariIntroduit + SEPARADOR + passIntroduit + SEPARADOR + "Mobile";
 
 
         final Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                String codiRequestXifrat="";
-                try  {
+                String codiRequestXifrat = "";
+                try {
                     try {
                         if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
                             showToast("Falten dades");
                         } else {
                             ConnexioServidor connexioServidor = new ConnexioServidor();
-                            codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                            codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, ALGORISME);
                             codiSessio = connexioServidor.consulta(codiRequestXifrat);
-                            if(codiSessio.equals("FAIL")){
+                            if (codiSessio.equals("FAIL")) {
                                 showToast("Usuari o contrasenya invàlids");
-                            }else if (codiSessio.startsWith("OK")){
-                                String message = usuariIntroduit +"Sep@!-@rad0R"+"Mobile";
+                            } else if (codiSessio.startsWith("OK")) {
+                                String message = usuariIntroduit + SEPARADOR + "Mobile";
                                 showToast("Usuari i contrasenya vàlids");
                                 Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
-                                i.putExtra(EXTRA_MESSAGE,message);
+                                i.putExtra(EXTRA_MESSAGE, message);
                                 startActivity(i);
                                 finish();
-                            }else{
+                            } else {
                                 showToast("El servidor no respon");
                             }
                         }
@@ -177,11 +178,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      * @param toast amb el text del missatge
      */
-    public void showToast(final String toast)
-    {
+    public void showToast(final String toast) {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
                 Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
         });

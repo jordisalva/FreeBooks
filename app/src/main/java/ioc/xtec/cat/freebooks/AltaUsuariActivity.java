@@ -16,10 +16,13 @@ import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
 public class AltaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String SEPARADOR = "Sep@!-@rad0R";
+    public static final String ALGORISME = "AES/ECB/PKCS5Padding";
+
     // Variables dels botons
     Button botoAltaUsuari, botoCancelar;
     // Variables pels editText
-    EditText userText,userPass,userConfirmPass,userEmail;
+    EditText userText, userPass, userConfirmPass, userEmail;
     private String resposta = "";
 
     // Variable amb l'intent
@@ -35,15 +38,15 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alta_usuari);
 
-        userText = (EditText)findViewById(R.id.textUsuari);
-        userPass = (EditText)findViewById(R.id.textContrasenya);
-        userConfirmPass = (EditText)findViewById(R.id.textConfirmaContrasenya);
-        userEmail = (EditText)findViewById(R.id.textMail);
+        userText = (EditText) findViewById(R.id.textUsuari);
+        userPass = (EditText) findViewById(R.id.textContrasenya);
+        userConfirmPass = (EditText) findViewById(R.id.textConfirmaContrasenya);
+        userEmail = (EditText) findViewById(R.id.textMail);
 
         // Definim els listeners
-        botoAltaUsuari = ((Button)findViewById(R.id.buttonDonarAlta));
+        botoAltaUsuari = ((Button) findViewById(R.id.buttonDonarAlta));
         botoAltaUsuari.setOnClickListener(this);
-        botoCancelar = ((Button)findViewById(R.id.buttonCancelar));
+        botoCancelar = ((Button) findViewById(R.id.buttonCancelar));
         botoCancelar.setOnClickListener(this);
 
         // Crea un intent amb la pantalla de login
@@ -67,12 +70,12 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
 
         if (v == botoAltaUsuari) {
 
-            if(usuariIntroduit.equals("")||passIntroduit.equals("")||passConfirmacioIntroduit.equals("")||emailIntroduit.equals("")) {
+            if (usuariIntroduit.equals("") || passIntroduit.equals("") || passConfirmacioIntroduit.equals("") || emailIntroduit.equals("")) {
                 showToast("Falten dades");
             } else {
-                if(!passIntroduit.equals(passConfirmacioIntroduit)) {
+                if (!passIntroduit.equals(passConfirmacioIntroduit)) {
                     showToast("Contrasenya diferent");
-                } else{
+                } else {
                     // Crida per donar d'alta l'usuari
                     altaUsuari();
                 }
@@ -88,8 +91,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
      * Torna a la pantalla de login en cas de prémer el botó "Back"
      */
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         super.onBackPressed();
         startActivity(i);
         finish();
@@ -100,22 +102,22 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
      */
     public void altaUsuari() {
         final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-        final String codiRequest = "nouLogin"+"Sep@!-@rad0R"+userText.getText()+"Sep@!-@rad0R"+userPass.getText()+"Sep@!-@rad0R"+"Mobile"+"Sep@!-@rad0R"+userEmail.getText();
+        final String codiRequest = "nouLogin" + SEPARADOR + userText.getText() + SEPARADOR + userPass.getText() + SEPARADOR + "Mobile" + SEPARADOR + userEmail.getText();
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                try  {
+                try {
                     ConnexioServidor connexioServidor = new ConnexioServidor();
-                    String codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec)sKey, "AES/ECB/PKCS5Padding");
+                    String codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, ALGORISME);
                     resposta = connexioServidor.consulta(codiRequestXifrat);
-                    if(resposta.equals("OK")){
+                    if (resposta.equals("OK")) {
                         showToast("Usuari Creat");
                         startActivity(i);
                         finish();
-                    }else if(resposta.equals("FAIL")){
+                    } else if (resposta.equals("FAIL")) {
                         showToast("L'usuari ja existeix");
-                    }else{
+                    } else {
                         showToast("El servidor no respon");
                     }
                 } catch (Exception e) {
@@ -131,11 +133,9 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
      *
      * @param toast amb el text del missatge
      */
-    public void showToast(final String toast)
-    {
+    public void showToast(final String toast) {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
                 Toast.makeText(AltaUsuariActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
         });

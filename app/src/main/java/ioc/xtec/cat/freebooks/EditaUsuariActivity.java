@@ -18,6 +18,7 @@ import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 public class EditaUsuariActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String SEPARADOR = "Sep@!-@rad0R";
+    public static final String ALGORISME = "AES/ECB/PKCS5Padding";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
 
     // Variables dels botons
@@ -76,7 +77,6 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
 
 
         if (v == botoGuardar) {
-
             if (usuariIntroduit.equals("") || passIntroduit.equals("") || passConfirmacioIntroduit.equals("") || emailIntroduit.equals("")) {
                 showToast("Falten dades");
             } else {
@@ -89,11 +89,6 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    /**try {
-                     Thread.sleep(500);
-                     } catch (Exception e) {
-                     e.printStackTrace();
-                     }**/
                 }
             }
         } else {
@@ -130,13 +125,13 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                 public void run() {
                     try {
                         ConnexioServidor connexioServidor = new ConnexioServidor();
-                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             ConnexioServidor connexioServidor2 = new ConnexioServidor();
                             String llistaLogs = "getLogins";
                             try {
-                                codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
-                                llistaLogs = desencriptaDades(connexioServidor2.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec) sKey, ALGORISME);
+                                llistaLogs = desencriptaDades(connexioServidor2.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -150,6 +145,11 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                                     userEmail.setText(usr.split(SEPARADOR)[4]);
                                 }
                             }
+                        } else {
+                            showToast("El servidor no respón, torna a fer el login més tard...");
+                            Intent i = new Intent(EditaUsuariActivity.this, MainActivity.class);
+                            startActivity(i);
+                            finish();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -176,18 +176,17 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                        String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                         ConnexioServidor connexioServidor = new ConnexioServidor();
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             String req = "editLoginMyLogin" + SEPARADOR + extra.split(SEPARADOR)[0]
                                     + SEPARADOR + extra.split(SEPARADOR)[1] + SEPARADOR
                                     + userText.getText() + SEPARADOR + userPass.getText() + SEPARADOR + userEmail.getText();
-                            codiRequestXifrat = encriptaDades(req, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                            codiRequestXifrat = encriptaDades(req, (SecretKeySpec) sKey, ALGORISME);
                             String res = connexioServidor.consulta(codiRequestXifrat);
                             if (res.equals("OK")) {
                                 showToast("Dades guardades correctament");
-                                //String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-                                String extra = userText.getText() + "Sep@!-@rad0R" + "Mobile";
+                                String extra = userText.getText() + SEPARADOR + "Mobile";
                                 i.putExtra(EXTRA_MESSAGE, extra);
                                 startActivity(i);
                                 finish();
@@ -197,6 +196,11 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                             } else {
                                 showToast("No s'han pogut actualitzar les dades");
                             }
+                        } else {
+                            showToast("El servidor no respón, torna a fer el login més tard...");
+                            Intent i = new Intent(EditaUsuariActivity.this, MainActivity.class);
+                            startActivity(i);
+                            finish();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

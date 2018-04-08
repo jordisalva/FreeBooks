@@ -17,14 +17,14 @@ public class Llibre {
     /**
      * Constructor
      *
-     * @param titol amb el títol del llibre
-     * @param autor amb l'autor del llibre
-     * @param descripcio amb la descripció del llibre
+     * @param titol         amb el títol del llibre
+     * @param autor         amb l'autor del llibre
+     * @param descripcio    amb la descripció del llibre
      * @param imatgePortada amb la imatge de la portada
-     * @param edAndYear amb l'editor i l'any
-     * @param numPags amb el número de pàgines
-     * @param idioma amb l'idioma
-     * @param ISBN amb el número d'ISBN
+     * @param edAndYear     amb l'editor i l'any
+     * @param numPags       amb el número de pàgines
+     * @param idioma        amb l'idioma
+     * @param ISBN          amb el número d'ISBN
      */
     public Llibre(String titol, String autor, String descripcio, String imatgePortada, String edAndYear, String numPags, String idioma, String ISBN) {
         this.titol = titol;

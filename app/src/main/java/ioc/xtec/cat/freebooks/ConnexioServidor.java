@@ -24,10 +24,10 @@ public class ConnexioServidor {
      * @return String amb la resposta del servidor
      */
     public String consulta(String dades) {
-        try{
+        try {
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress("10.0.2.2", 9999), 1000);
-            try(BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))){
+            try (BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
                 escriptor.write(dades);
                 escriptor.newLine();
                 escriptor.flush();
@@ -38,7 +38,7 @@ public class ConnexioServidor {
                 }
             }
             socket.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return resposta;

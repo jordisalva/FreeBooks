@@ -39,6 +39,11 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     // Variable amb l'intent
     Intent i;
 
+    /**
+     * Accions en la creació
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +69,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textDescripcio.setText(bundle.getString("Descripcio"));
         textDescripcio.setMovementMethod(new ScrollingMovementMethod());
         //strImatge = bundle.getString("ImatgePortada");
-        strImatge = pref.getString("ImatgePortada",null);
+        strImatge = pref.getString("ImatgePortada", null);
         byte[] decodedString = Base64.decode(strImatge, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imatgeLlibre.setImageBitmap(decodedByte);
@@ -74,9 +79,9 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         textISBN.setText(bundle.getString("ISBN"));
 
         // Definim els listeners
-        btnReserva = ((Button)findViewById(R.id.btnReserva));
+        btnReserva = ((Button) findViewById(R.id.btnReserva));
         btnReserva.setOnClickListener(this);
-        btnTornar = ((Button)findViewById(R.id.btnTornar));
+        btnTornar = ((Button) findViewById(R.id.btnTornar));
         btnTornar.setOnClickListener(this);
 
         // Crea un intent amb la pantalla de login
@@ -98,7 +103,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
             showToast("Estarà disponible al TEA4!");
         } else if (v == btnTornar) {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-            i.putExtra(EXTRA_MESSAGE,extra);
+            i.putExtra(EXTRA_MESSAGE, extra);
             startActivity(i);
             finish();
         }
@@ -109,11 +114,9 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
      *
      * @param toast amb el text del missatge
      */
-    public void showToast(final String toast)
-    {
+    public void showToast(final String toast) {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
                 Toast.makeText(VisualitzarInfoLlibre.this, toast, Toast.LENGTH_SHORT).show();
             }
         });
@@ -126,7 +129,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     public void onBackPressed() {
         // Torna a la pantalla principal
         String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
-        i.putExtra(EXTRA_MESSAGE,extra);
+        i.putExtra(EXTRA_MESSAGE, extra);
         startActivity(i);
         finish();
     }

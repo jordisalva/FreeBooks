@@ -29,13 +29,25 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
     private Context context;
     FiltreLlibres filter;
 
-    //Creem el constructor
+    /**
+     * Creem el constructor
+     *
+     * @param context
+     * @param items
+     */
     public Adaptador(Context context, ArrayList<Llibre> items) {
         this.context = context;
-        this.items= items;
-        this.filterList=items;
+        this.items = items;
+        this.filterList = items;
     }
-    //Crea noves files (l'invoca el layout manager). Aquí fem referència al layout fila.xml
+
+    /**
+     * Crea noves files (l'invoca el layout manager). Aquí fem referència al layout fila.xml
+     *
+     * @param parent
+     * @param viewType
+     * @return
+     */
     @Override
     public Adaptador.ElMeuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
@@ -45,38 +57,51 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         ElMeuViewHolder viewHolder = new ElMeuViewHolder(itemLayoutView);
         return viewHolder;
     }
-    //Retorna la quantitat de les dades
+
+    /**
+     * Retorna la quantitat de les dades
+     *
+     * @return la quantitat de les dades
+     */
     @Override
     public int getItemCount() {
         return items.size();
     }
-    // Retorna l'objecte filtrat
+
+    /**
+     * Retorna l'objecte filtrat
+     *
+     * @return l'objecte filtrat
+     */
     @Override
     public Filter getFilter() {
-        if(filter==null)
-        {
-            filter=new FiltreLlibres(filterList,this);
+        if (filter == null) {
+            filter = new FiltreLlibres(filterList, this);
         }
-
         return filter;
     }
-    //Carreguem els widgets amb les dades (l'invoca el layout manager)
+
+    /**
+     * Carreguem els widgets amb les dades (l'invoca el layout manager)
+     *
+     * @param viewHolder
+     * @param position   Conté la posició de l'element actual a la llista.
+     *                   També l'utilitzarem com a índex per a recòrrer les dades
+     */
     @Override
     public void onBindViewHolder(final ElMeuViewHolder viewHolder, final int position) {
-        /**
-         *position conté la posició de l'element actual a la llista. També l'utilitzarem
-         *com a índex per a recòrrer les dades
-         **/
+        // String amb l'imatge en base64
         String base64StringImage = items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0];
-
         Bitmap decodedByte = null;
         try {
+            // Decodifica l'imatge
             byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
             decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // Carreguem els widgets amb les dades
         viewHolder.vThumbnail.setImageBitmap(decodedByte);
         viewHolder.vTitle.setText(items.get(position).titol);
         viewHolder.vAutor.setText(items.get(position).autor);
@@ -84,11 +109,11 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public  void onClick(View v) {
+            public void onClick(View v) {
                 //Passem la imatge com a SharedPreferences
-                SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
+                SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
                 SharedPreferences.Editor ed = pref.edit();
-                ed.putString("ImatgePortada",items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0]);
+                ed.putString("ImatgePortada", items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0]);
                 ed.commit();
                 //Crea un nou intent per visualitzar la informació del llibre
                 Intent intent = new Intent(context, VisualitzarInfoLlibre.class);
@@ -100,33 +125,36 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 intent.putExtra("NumPagines", items.get(position).numPags);
                 intent.putExtra("Idioma", items.get(position).idioma);
                 intent.putExtra("ISBN", items.get(position).ISBN);
-                final String extra = ((PrincipalActivity)context).getIntent().getStringExtra(EXTRA_MESSAGE);
-                intent.putExtra(EXTRA_MESSAGE,extra);
+                final String extra = ((PrincipalActivity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                intent.putExtra(EXTRA_MESSAGE, extra);
                 context.startActivity(intent);
             }
         });
 
-        //Al fer un click llarg sobre un llibre
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                /**
-                //Borrem el llibre de la llista visualitzada(no de les dades guardades)
-                items.remove(position);
-                //Notifiquem el canvi
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, items.size());**/
-                return true;
-            }
+        /**
+         * De moment no s'utilitza
+         //Al fer un click llarg sobre un llibre
+         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        @Override public boolean onLongClick(View v) {
+        //Borrem el llibre de la llista visualitzada(no de les dades guardades)
+        items.remove(position);
+        //Notifiquem el canvi
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, items.size());
+        return true;
+        }
         });
-
+         **/
     }
 
-    //Definim el nostre ViewHolder, és a dir, un element de la llista en qüestió
+    /**
+     * Definim el nostre ViewHolder, és a dir, un element de la llista en qüestió
+     */
     public static class ElMeuViewHolder extends RecyclerView.ViewHolder {
         protected ImageView vThumbnail;
         protected TextView vTitle;
         protected TextView vAutor;
+
         public ElMeuViewHolder(View v) {
             super(v);
             vThumbnail = (ImageView) v.findViewById(R.id.thumbnail);

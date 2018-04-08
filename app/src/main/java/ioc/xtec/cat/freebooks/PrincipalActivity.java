@@ -33,9 +33,8 @@ import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 public class PrincipalActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String SEPARADOR = "Sep@!-@rad0R";
-    public static final String SEPARADOR_IMATGE = "@LENGTH@";
+    public static final String ALGORISME = "AES/ECB/PKCS5Padding";
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
-
 
     // Variable del botó logout
     Button botoLogout;
@@ -67,6 +66,12 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
         broadcast_reciever = new BroadcastReceiver() {
 
+            /**
+             * Si es res un finish, es finalitza PrincipalActivity
+             *
+             * @param arg0
+             * @param intent
+             */
             @Override
             public void onReceive(Context arg0, Intent intent) {
                 String action = intent.getAction();
@@ -75,6 +80,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 }
             }
         };
+        // Registrem el receiver
         registerReceiver(broadcast_reciever, new IntentFilter("finish"));
 
         // Crea un intent amb la pantalla de login
@@ -120,22 +126,32 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.app_search);
-        //searchView = (SearchView) searchMenuItem.getActionView();
         searchView =
                 (SearchView) menu.findItem(R.id.app_search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        //searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
         searchView.setFocusable(true);
         searchView.setIconified(true);
         searchView.requestFocusFromTouch();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            /**
+             * No implementat
+             *
+             * @param query
+             * @return
+             */
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
 
+            /**
+             * Al modificar el text es van mostrant els resultats filtrats en la llista
+             *
+             * @param query Amb el text per el que es filtraran els resultats
+             * @return
+             */
             @Override
             public boolean onQueryTextChange(String query) {
                 adapter.getFilter().filter(query);
@@ -180,6 +196,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Mostrem la barra de progrés
             barra_progres.setVisibility(View.VISIBLE);
 
+            // Executa la tasca per carregar els llibres
             new CarregaLlibres().execute((Void) null);
 
         }
@@ -194,7 +211,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      */
     @Override
     public void onClick(View v) {
-
+        // No implementat
     }
 
     /**
@@ -233,7 +250,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                 String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
                                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                 try {
-                                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                                 } catch (Exception ex) {
                                     System.err.println("Error al encriptar: " + ex);
                                 }
@@ -241,7 +258,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                 if (resposta.equals("OK")) {
                                     String codiRequest = "userLogout" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                     try {
-                                        codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                                        codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, ALGORISME);
                                     } catch (Exception ex) {
                                         System.err.println("Error al encriptar: " + ex);
                                     }
@@ -249,6 +266,10 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                                     if (resposta2.equals("OK")) {
                                         showToast("Sessió tancada correctament");
                                     }
+                                    startActivity(i);
+                                    finish();
+                                } else {
+                                    showToast("El servidor no respón, torna a fer el login més tard...");
                                     startActivity(i);
                                     finish();
                                 }
@@ -300,7 +321,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
             String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
             try {
-                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
             } catch (Exception ex) {
                 System.err.println("Error al encriptar: " + ex);
             }
@@ -309,11 +330,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 // El servidor retorna la llista de llibres en un string
                 String llistaBooks = "getBooks";
                 try {
-                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, ALGORISME);
                     // Anirem fent connexions al servidor demanant la llista de llibres, fins que aquesta es pugui desencriptar correctament
                     while (llistaBooks.equals("getBooks")) {
                         try {
-                            llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, "AES/ECB/PKCS5Padding");
+                            llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
                         } catch (Exception ex) {
                             System.err.println("Error al desencriptar: " + ex);
                         }
@@ -348,6 +369,10 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                 } else {
                     showToast("No hi ha llibres a la base de dades");
                 }
+            } else {
+                showToast("El servidor no respón, torna a fer el login més tard...");
+                startActivity(i);
+                finish();
             }
 
             return null;
@@ -384,6 +409,9 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * Desregistrem el receiver, al finalitzar l'activity.
+     */
     @Override
     protected void onStop() {
         unregisterReceiver(broadcast_reciever);
