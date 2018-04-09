@@ -49,7 +49,7 @@ public class FiltreLlibres extends Filter {
 
             for (int i = 0; i < filterList.size(); i++) {
                 //Obtenim cada un dels titols o autors dels llibres disponibles a la bdd
-                texteOnBuscar = filterList.get(i).titol + " " + filterList.get(i).autor;
+                texteOnBuscar = filterList.get(i).getTitol() + " " + filterList.get(i).getAutor();
                 texteOnBuscarSenseAccents = Normalizer.normalize(texteOnBuscar, Normalizer.Form.NFD)
                         .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                 Pattern regex = Pattern.compile("\\b" + Pattern.quote(paraulaBuscada), Pattern.CASE_INSENSITIVE);

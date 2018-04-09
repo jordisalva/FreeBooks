@@ -37,8 +37,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
      */
     public Adaptador(Context context, ArrayList<Llibre> items) {
         this.context = context;
-        this.items = items;
-        this.filterList = items;
+        this.items= items;
+        this.filterList=items;
     }
 
     /**
@@ -75,8 +75,9 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
      */
     @Override
     public Filter getFilter() {
-        if (filter == null) {
-            filter = new FiltreLlibres(filterList, this);
+        if(filter==null)
+        {
+            filter=new FiltreLlibres(filterList,this);
         }
         return filter;
     }
@@ -85,13 +86,13 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
      * Carreguem els widgets amb les dades (l'invoca el layout manager)
      *
      * @param viewHolder
-     * @param position   Conté la posició de l'element actual a la llista.
-     *                   També l'utilitzarem com a índex per a recòrrer les dades
+     * @param position Conté la posició de l'element actual a la llista.
+     *                 També l'utilitzarem com a índex per a recòrrer les dades
      */
     @Override
     public void onBindViewHolder(final ElMeuViewHolder viewHolder, final int position) {
         // String amb l'imatge en base64
-        String base64StringImage = items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0];
+        String base64StringImage = items.get(position).getImatgePortada().split(SEPARADOR_IMATGE)[0];
         Bitmap decodedByte = null;
         try {
             // Decodifica l'imatge
@@ -103,46 +104,47 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
         // Carreguem els widgets amb les dades
         viewHolder.vThumbnail.setImageBitmap(decodedByte);
-        viewHolder.vTitle.setText(items.get(position).titol);
-        viewHolder.vAutor.setText(items.get(position).autor);
+        viewHolder.vTitle.setText(items.get(position).getTitol());
+        viewHolder.vAutor.setText(items.get(position).getAutor());
 
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public  void onClick(View v) {
                 //Passem la imatge com a SharedPreferences
-                SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+                SharedPreferences pref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
                 SharedPreferences.Editor ed = pref.edit();
-                ed.putString("ImatgePortada", items.get(position).imatgePortada.split(SEPARADOR_IMATGE)[0]);
+                ed.putString("ImatgePortada",items.get(position).getImatgePortada().split(SEPARADOR_IMATGE)[0]);
                 ed.commit();
                 //Crea un nou intent per visualitzar la informació del llibre
                 Intent intent = new Intent(context, VisualitzarInfoLlibre.class);
-                intent.putExtra("Titol", items.get(position).titol);
-                intent.putExtra("Autor", items.get(position).autor);
-                intent.putExtra("Descripcio", items.get(position).descripcio);
+                intent.putExtra("Titol", items.get(position).getTitol());
+                intent.putExtra("Autor", items.get(position).getAutor());
+                intent.putExtra("Descripcio", items.get(position).getDescripcio());
                 //intent.putExtra("ImatgePortada", items.get(position).imatgePortada);
-                intent.putExtra("EditorIAny", items.get(position).edAndYear);
-                intent.putExtra("NumPagines", items.get(position).numPags);
-                intent.putExtra("Idioma", items.get(position).idioma);
-                intent.putExtra("ISBN", items.get(position).ISBN);
-                final String extra = ((PrincipalActivity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
-                intent.putExtra(EXTRA_MESSAGE, extra);
+                intent.putExtra("EditorIAny", items.get(position).getEdAndYear());
+                intent.putExtra("NumPagines", items.get(position).getNumPags());
+                intent.putExtra("Idioma", items.get(position).getIdioma());
+                intent.putExtra("ISBN", items.get(position).getISBN());
+                final String extra = ((PrincipalActivity)context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                intent.putExtra(EXTRA_MESSAGE,extra);
                 context.startActivity(intent);
             }
         });
 
         /**
          * De moment no s'utilitza
-         //Al fer un click llarg sobre un llibre
-         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-        @Override public boolean onLongClick(View v) {
-        //Borrem el llibre de la llista visualitzada(no de les dades guardades)
-        items.remove(position);
-        //Notifiquem el canvi
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, items.size());
-        return true;
-        }
+        //Al fer un click llarg sobre un llibre
+        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //Borrem el llibre de la llista visualitzada(no de les dades guardades)
+                items.remove(position);
+                //Notifiquem el canvi
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, items.size());
+                return true;
+            }
         });
          **/
     }
@@ -154,7 +156,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         protected ImageView vThumbnail;
         protected TextView vTitle;
         protected TextView vAutor;
-
         public ElMeuViewHolder(View v) {
             super(v);
             vThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
