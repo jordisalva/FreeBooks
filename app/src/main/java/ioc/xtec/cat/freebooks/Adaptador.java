@@ -25,9 +25,9 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
-    public ArrayList<Llibre> items, filterList;
+    private ArrayList<Llibre> items, filterList;
     private Context context;
-    FiltreLlibres filter;
+    private FiltreLlibres filter;
 
     /**
      * Creem el constructor
@@ -147,6 +147,38 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             }
         });
          **/
+    }
+
+    /**
+     * Getters i Setters
+     */
+
+    public ArrayList<Llibre> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Llibre> items) {
+        this.items = items;
+    }
+
+    public ArrayList<Llibre> getFilterList() {
+        return filterList;
+    }
+
+    public void setFilterList(ArrayList<Llibre> filterList) {
+        this.filterList = filterList;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public void setFilter(FiltreLlibres filter) {
+        this.filter = filter;
     }
 
     /**

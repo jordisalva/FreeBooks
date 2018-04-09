@@ -83,7 +83,7 @@ public class FiltreLlibres extends Filter {
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
 
-        adapter.items = (ArrayList<Llibre>) results.values;
+        adapter.setItems((ArrayList<Llibre>) results.values);
 
         // Nofifica els canvis a l'adaptador
         adapter.notifyDataSetChanged();

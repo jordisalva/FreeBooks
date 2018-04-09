@@ -37,6 +37,10 @@ public class Llibre {
         this.ISBN = ISBN;
     }
 
+    /**
+     * Getters i Setters
+     */
+
     public String getTitol() {
         return titol;
     }
