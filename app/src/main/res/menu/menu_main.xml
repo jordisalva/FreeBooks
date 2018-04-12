@@ -27,4 +27,10 @@
         android:orderInCategory="400"
         android:title="@string/app_search"
         app:actionViewClass="android.widget.SearchView" />
+    <item
+        android:id="@+id/app_bookings"
+        android:icon="@android:drawable/ic_input_get"
+        android:orderInCategory="500"
+        android:title="@string/app_bookings"
+        app:showAsAction="always" />
 </menu>

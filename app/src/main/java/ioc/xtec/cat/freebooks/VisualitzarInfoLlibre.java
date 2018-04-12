@@ -72,7 +72,14 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         strImatge = pref.getString("ImatgePortada", null);
         byte[] decodedString = Base64.decode(strImatge, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        imatgeLlibre.setImageBitmap(decodedByte);
+        // Si hi ha imatge carrega l'imatge
+        if (decodedByte != null) {
+            imatgeLlibre.setBackground(null);
+            imatgeLlibre.setImageBitmap(decodedByte);
+            // Si no hi ha imatge carrega una imatge per defecte
+        } else {
+            imatgeLlibre.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+        }
         textEditorIAny.setText(bundle.getString("EditorIAny"));
         textNumPagines.setText(bundle.getString("NumPagines"));
         textIdioma.setText(bundle.getString("Idioma"));
