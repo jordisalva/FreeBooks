@@ -18,18 +18,38 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="295dp"
+        android:layout_width="229dp"
         android:layout_height="40dp"
         android:layout_above="@+id/autor"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignStart="@+id/autor" />
 
     <TextView
         android:id="@+id/autor"
-        android:layout_width="295dp"
+        android:layout_width="229dp"
         android:layout_height="40dp"
         android:layout_alignBottom="@+id/thumbnail"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="63dp"
         android:textStyle="italic" />
+
+    <ImageButton
+        android:id="@+id/buttonReservar"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textReservar"
+        android:layout_toEndOf="@+id/title"
+        android:contentDescription="@string/boto_reservar"
+        android:src="@android:drawable/ic_input_get" />
+
+    <TextView
+        android:id="@+id/textReservar"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/title"
+        android:layout_toEndOf="@+id/title"
+        android:gravity="center"
+        android:text="@string/labelReservar"
+        android:textSize="12sp" />
 
 
 </RelativeLayout>

@@ -1,10 +1,13 @@
 package ioc.xtec.cat.freebooks;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -12,9 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -101,7 +106,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         // Carreguem els widgets amb les dades
 
         // Si hi ha imatge carrega l'imatge
@@ -158,6 +163,48 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         }
         });
          **/
+
+
+        /**
+         * Creem un missatge de confirmació de la reserva
+         */
+
+        // Definim els listeners
+        viewHolder.vButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                // Crea un missatge d'alerta
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+
+                // Títol del missatge d'alerta
+                alertDialogBuilder.setTitle("Reservar: ");
+
+                // Defineix el missatge de l'alerta
+                alertDialogBuilder
+                        .setMessage("Vols reservar el llibre: \n" + items.get(position).getTitol() + "?")
+                        .setCancelable(false)
+                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
+                                viewHolder.vtext.setText("Reservat!");
+                                viewHolder.vButton.setVisibility(View.GONE);
+                                Toast.makeText(context, "Has reservat el llibre: \n" + items.get(position).getTitol(), Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                // Crea un missatge d'alerta
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // Mostra el missatge d'alerta
+                alertDialog.show();
+            }
+        });
     }
 
     /**
@@ -199,12 +246,16 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         protected ImageView vThumbnail;
         protected TextView vTitle;
         protected TextView vAutor;
+        protected TextView vtext;
+        protected ImageButton vButton;
 
         public ElMeuViewHolder(View v) {
             super(v);
             vThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             vTitle = (TextView) v.findViewById(R.id.title);
             vAutor = (TextView) v.findViewById(R.id.autor);
+            vButton = (ImageButton) v.findViewById(R.id.buttonReservar);
+            vtext = (TextView) v.findViewById(R.id.textReservar);
         }
     }
 

@@ -107,7 +107,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
         if (v == btnReserva) {
-            showToast("Estarà disponible al TEA4!");
+            showToast("Has reservat el llibre: \n" + textTitol.getText());
         } else if (v == btnTornar) {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             i.putExtra(EXTRA_MESSAGE, extra);

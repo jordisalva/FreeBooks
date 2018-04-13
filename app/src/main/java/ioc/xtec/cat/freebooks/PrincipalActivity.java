@@ -199,6 +199,9 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Executa la tasca per carregar els llibres
             new CarregaLlibres().execute((Void) null);
 
+        } else if (id == R.id.app_bookings) {
+            // TODO Al fer click s'han de mostrar a la pantalla principal els llibres reservats
+            showToast("Encara no implementat, es mostraran els llibres reservats");
         }
 
         return super.onOptionsItemSelected(item);
