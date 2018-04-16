@@ -47,4 +47,9 @@
     <string name="app_bookings">Bookings</string>
     <string name="boto_reservar">Botó Reservar</string>
     <string name="labelReservar">Reservar:</string>
+    <string name="titol_reserves">Reserves</string>
+    <string name="titol_de_prova">Titol de prova</string>
+    <string name="autor_de_prova">Autor de prova</string>
+    <string name="_16_04_2018">16/04/2018</string>
+    <string name="data_reserva">Data Recollida:</string>
 </resources>

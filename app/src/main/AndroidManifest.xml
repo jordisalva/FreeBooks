@@ -23,8 +23,6 @@
         <activity android:name=".PrincipalActivity">
             <intent-filter>
                 <action android:name="ioc.xtec.cat.freebooks.PrincipalActivity" />
-
-
             </intent-filter>
         </activity>
         <activity android:name=".AltaUsuariActivity">
@@ -44,6 +42,13 @@
         <activity android:name=".VisualitzarInfoLlibre">
             <intent-filter>
                 <action android:name="ioc.xtec.cat.freebooks.VisualitzarInfoLlibre" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Reserves">
+            <intent-filter>
+                <action android:name="ioc.xtec.cat.freebooks.Reserves" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

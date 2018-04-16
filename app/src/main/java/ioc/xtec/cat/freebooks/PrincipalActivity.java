@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +51,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     private Adaptador adapter;
     private ProgressBar barra_progres;
     MenuItem searchMenuItem;
+    MenuItem bookingsMenuItem;
     SearchView searchView;
     SearchManager searchManager;
     BroadcastReceiver broadcast_reciever;
@@ -123,6 +125,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        bookingsMenuItem = menu.findItem(R.id.app_bookings);
+        bookingsMenuItem.getIcon().setTint(Color.WHITE);
         searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.app_search);
@@ -200,7 +204,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             new CarregaLlibres().execute((Void) null);
 
         } else if (id == R.id.app_bookings) {
-            // TODO Al fer click s'han de mostrar a la pantalla principal els llibres reservats
+            // TODO Al fer click t'ha de portar a la pantalla de reserves (Falta crear-la)
             showToast("Encara no implementat, es mostraran els llibres reservats");
         }
 

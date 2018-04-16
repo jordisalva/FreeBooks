@@ -1,6 +1,8 @@
 package ioc.xtec.cat.freebooks;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
@@ -22,18 +25,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by jordi on 17/03/2018.
  */
 
-public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> implements Filterable {
+public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> implements Filterable, DatePickerDialog.OnDateSetListener {
 
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
     private ArrayList<Llibre> items, filterList;
     private Context context;
     private FiltreLlibres filter;
+    private int anyInici, mesInici, diaInici, any, dia, mes;
+    private DatePickerDialog datePickerDialog;
+    private ElMeuViewHolder viewHolder;
+    private int posicioReserva;
 
     /**
      * Creem el constructor
@@ -60,7 +68,10 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         View itemLayoutView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fila, null);
         // create ViewHolder
-        ElMeuViewHolder viewHolder = new ElMeuViewHolder(itemLayoutView);
+        viewHolder = new ElMeuViewHolder(itemLayoutView);
+        // Posa en blanc l'icona de llibre
+        viewHolder.vButton.setColorFilter(Color.WHITE);
+        posicioReserva = 0;
         return viewHolder;
     }
 
@@ -118,11 +129,12 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
             viewHolder.vThumbnail.getLayoutParams().height = 220;
             viewHolder.vThumbnail.getLayoutParams().width = 220;
-            RelativeLayout.LayoutParams layoutarams = (RelativeLayout.LayoutParams)viewHolder.vThumbnail.getLayoutParams();
+            RelativeLayout.LayoutParams layoutarams = (RelativeLayout.LayoutParams) viewHolder.vThumbnail.getLayoutParams();
             layoutarams.leftMargin = 0;
         }
         viewHolder.vTitle.setText(items.get(position).getTitol());
         viewHolder.vAutor.setText(items.get(position).getAutor());
+
 
         //Al fer click sobre un llibre
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -182,14 +194,25 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
                 // Defineix el missatge de l'alerta
                 alertDialogBuilder
-                        .setMessage("Vols reservar el llibre: \n" + items.get(position).getTitol() + "?")
+                        .setMessage("Vols reservar el llibre: " +
+                                items.get(position).getTitol() + "? \n\n" +
+                                "Al fer click a \"Sí\" hauras de triar el dia que vols recollir el llibre")
                         .setCancelable(false)
                         .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
-                                viewHolder.vtext.setText("Reservat!");
-                                viewHolder.vButton.setVisibility(View.GONE);
-                                Toast.makeText(context, "Has reservat el llibre: \n" + items.get(position).getTitol(), Toast.LENGTH_SHORT).show();
+                                posicioReserva = position;
+                                final Calendar c = Calendar.getInstance();
+                                anyInici = c.get(Calendar.YEAR);
+                                mesInici = c.get(Calendar.MONTH);
+                                diaInici = c.get(Calendar.DAY_OF_MONTH);
+                                datePickerDialog = new DatePickerDialog(
+                                        context, Adaptador.this, anyInici, mesInici, diaInici);
+                                datePickerDialog.setTitle("Indica la data de reserva");
+                                // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
+                                datePickerDialog.show();
+                                //viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
+                                //viewHolder.vtext.setText("Reservat!");
+                                //viewHolder.vButton.setVisibility(View.GONE);
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -237,6 +260,27 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
     public void setFilter(FiltreLlibres filter) {
         this.filter = filter;
+    }
+
+    /**
+     * @param view amb la vista
+     * @param any amb l'any de la reserva
+     * @param mes amb el mes de la reserva
+     * @param dia amb el dia de la reserva
+     */
+    @Override
+    public void onDateSet(DatePicker view, int any, int mes, int dia) {
+        mes = mes + 1;
+        Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
+        // TODO S'ha de fer la crida al servidor per guardar la reserva
+
+        // TODO Al finalitzar la reserva t'ha de portar a la pantalla de reserves (Falta crear-la)
+        // Crea un intent amb la pantalla de reserves
+        String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+        Intent i = new Intent(context, Reserves.class);
+        i.putExtra(EXTRA_MESSAGE, extrasMessage);
+        context.startActivity(i);
     }
 
     /**
