@@ -27,6 +27,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
+import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
+
 /**
  * Created by jordi on 17/03/2018.
  */
@@ -34,7 +40,9 @@ import java.util.Calendar;
 public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> implements Filterable, DatePickerDialog.OnDateSetListener {
 
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
+    public static final String SEPARADOR = "Sep@!-@rad0R";
     public static final String SEPARADOR_IMATGE = "@LENGTH@";
+    public static final String ALGORISME = "AES/ECB/PKCS5Padding";
     private ArrayList<Llibre> items, filterList;
     private Context context;
     private FiltreLlibres filter;
@@ -274,6 +282,25 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
         Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
         // TODO S'ha de fer la crida al servidor per guardar la reserva
+        final String dataReserva = any+"-"+mes+"-"+dia;
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
+                try {
+                    codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+                ConnexioServidor connexioServidor = new ConnexioServidor();
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+            }
+        });
+        thread.start();
 
         // TODO Al finalitzar la reserva t'ha de portar a la pantalla de reserves (Falta crear-la)
         // Crea un intent amb la pantalla de reserves
