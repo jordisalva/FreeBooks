@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by jordi on 07/03/2018.
@@ -25,8 +26,12 @@ public class ConnexioServidor {
      */
     public String consulta(String dades) {
         try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress("10.0.2.2", 9999), 1000);
+            System.setProperty("javax.net.ssl.trustStore", "/home/ferranb/Documents/Android/FreeBooks/ClientKeyStore.jks");
+            System.setProperty("javax.net.ssl.trustStorePassword", "Pass123");
+            SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            Socket socket = sslFactory.createSocket("localhost", 9999);
+            //Socket socket = new Socket();
+            //socket.connect(new InetSocketAddress("10.0.2.2", 9999), 1000);
             try (BufferedWriter escriptor = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
                 escriptor.write(dades);
                 escriptor.newLine();

@@ -1,6 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'servereac'
+            storeFile file('/home/ferranb/Documents/Android/FreeBooks/ClientKeyStore.jks')
+            storePassword 'Pass123'
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "ioc.xtec.cat.freebooks"
