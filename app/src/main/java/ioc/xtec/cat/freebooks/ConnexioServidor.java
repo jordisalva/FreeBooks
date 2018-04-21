@@ -40,6 +40,7 @@ public class ConnexioServidor {
     private final String TAG = "TAG";
     private char keystorepass[] = "key12345".toCharArray();
     private char keypassword[] = "12345key".toCharArray();
+
     Context context;
 
     public ConnexioServidor(Context context) {
