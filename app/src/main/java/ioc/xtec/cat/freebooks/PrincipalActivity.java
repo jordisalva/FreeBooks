@@ -253,7 +253,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
                             @Override
                             public void run() {
                                 String codiRequestXifrat = "";
-                                ConnexioServidor connexioServidor = new ConnexioServidor();
+                                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
                                 String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
                                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                                 try {
@@ -323,7 +323,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Borrem la llista antiga de llibres
             llistaLlibres.clear();
             // Realitzem la connexió amb el servidor
-            ConnexioServidor connexioServidor = new ConnexioServidor();
+            ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
             //Primer revisem si l'usuari està logat
             String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
             String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];

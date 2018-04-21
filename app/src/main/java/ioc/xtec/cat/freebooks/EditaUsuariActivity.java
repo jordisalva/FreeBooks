@@ -124,10 +124,10 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        ConnexioServidor connexioServidor = new ConnexioServidor();
+                        ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
                         String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
-                            ConnexioServidor connexioServidor2 = new ConnexioServidor();
+                            ConnexioServidor connexioServidor2 = new ConnexioServidor(getApplicationContext());
                             String llistaLogs = "getLogins";
                             try {
                                 codiRequestXifrat = encriptaDades(llistaLogs, (SecretKeySpec) sKey, ALGORISME);
@@ -177,7 +177,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                 public void run() {
                     try {
                         String codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
-                        ConnexioServidor connexioServidor = new ConnexioServidor();
+                        ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
                         if (connexioServidor.consulta(codiRequestXifrat).equals("OK")) {
                             String req = "editLoginMyLogin" + SEPARADOR + extra.split(SEPARADOR)[0]
                                     + SEPARADOR + extra.split(SEPARADOR)[1] + SEPARADOR

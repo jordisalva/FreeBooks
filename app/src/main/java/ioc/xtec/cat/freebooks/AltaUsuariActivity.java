@@ -108,7 +108,7 @@ public class AltaUsuariActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void run() {
                 try {
-                    ConnexioServidor connexioServidor = new ConnexioServidor();
+                    ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
                     String codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, ALGORISME);
                     resposta = connexioServidor.consulta(codiRequestXifrat);
                     if (resposta.equals("OK")) {

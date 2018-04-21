@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (usuariIntroduit.equals("") || passIntroduit.equals("")) {
                             showToast("Falten dades");
                         } else {
-                            ConnexioServidor connexioServidor = new ConnexioServidor();
+                            ConnexioServidor connexioServidor = new ConnexioServidor(c);
                             codiRequestXifrat = encriptaDades(codiRequest, (SecretKeySpec) sKey, ALGORISME);
                             codiSessio = connexioServidor.consulta(codiRequestXifrat);
                             if (codiSessio.equals("FAIL")) {

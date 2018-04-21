@@ -296,7 +296,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 } catch (Exception ex) {
                     System.err.println("Error al encriptar: " + ex);
                 }
-                ConnexioServidor connexioServidor = new ConnexioServidor();
+                ConnexioServidor connexioServidor = new ConnexioServidor(context);
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
             }
         });
