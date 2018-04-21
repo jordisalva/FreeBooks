@@ -46,7 +46,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
     private ArrayList<Llibre> items, filterList;
     private Context context;
     private FiltreLlibres filter;
-    private int anyInici, mesInici, diaInici, any, dia, mes;
+    private int anyInici, mesInici, diaInici;
     private DatePickerDialog datePickerDialog;
     private ElMeuViewHolder viewHolder;
     private int posicioReserva;
@@ -215,6 +215,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                                 diaInici = c.get(Calendar.DAY_OF_MONTH);
                                 datePickerDialog = new DatePickerDialog(
                                         context, Adaptador.this, anyInici, mesInici, diaInici);
+                                long now = System.currentTimeMillis() - 1000;
+                                datePickerDialog.getDatePicker().setMinDate(now);
                                 datePickerDialog.setTitle("Indica la data de reserva");
                                 // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
                                 datePickerDialog.show();
@@ -281,7 +283,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         mes = mes + 1;
         Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
         Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
-        // TODO S'ha de fer la crida al servidor per guardar la reserva
         final String dataReserva = any+"-"+mes+"-"+dia;
         Thread thread = new Thread(new Runnable() {
 
@@ -302,7 +303,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         });
         thread.start();
 
-        // TODO Al finalitzar la reserva t'ha de portar a la pantalla de reserves (Falta crear-la)
         // Crea un intent amb la pantalla de reserves
         String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
         Intent i = new Intent(context, Reserves.class);

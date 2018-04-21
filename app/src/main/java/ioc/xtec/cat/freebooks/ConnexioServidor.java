@@ -63,7 +63,7 @@ public class ConnexioServidor {
             InputStream keyin = context.getResources().openRawResource(R.raw.testserverkeys);
             ks.load(keyin, keystorepass);
             final SSLSocketFactory socketFactory = new SSLSocketFactory(ks);
-            socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            //socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
             try {
                 socket = (SSLSocket) socketFactory.createSocket();

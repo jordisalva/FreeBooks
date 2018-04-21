@@ -204,7 +204,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             new CarregaLlibres().execute((Void) null);
 
         } else if (id == R.id.app_bookings) {
-            // TODO Al fer click t'ha de portar a la pantalla de reserves (Falta crear-la)
+            // TODO Al fer click t'ha de portar a la pantalla de reserves (Falta implementar)
             showToast("Encara no implementat, es mostraran els llibres reservats");
         }
 
