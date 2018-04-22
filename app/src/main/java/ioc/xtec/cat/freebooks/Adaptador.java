@@ -291,14 +291,26 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
                 String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
                 String codiRequestXifrat = "";
-                String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
+                ConnexioServidor connexioServidor = new ConnexioServidor(context);
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
                 try {
-                    codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                 } catch (Exception ex) {
                     System.err.println("Error al encriptar: " + ex);
                 }
-                ConnexioServidor connexioServidor = new ConnexioServidor(context);
+
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
+                    try {
+                        codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    //TODO resposta si l'usuari no està logat
+                }
             }
         });
         thread.start();

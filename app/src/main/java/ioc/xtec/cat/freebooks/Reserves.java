@@ -49,6 +49,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
             // TODO Ha de poder editar la data de la reserva
         } else if (v == btnAnulaReserva) {
             // TODO Ha d'anular la reserva
+
         } else if (v == btnTornarReserves) {
             // Torna a la pantalla principal
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
