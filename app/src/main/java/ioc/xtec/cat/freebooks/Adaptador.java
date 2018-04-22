@@ -316,7 +316,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         thread.start();
 
         // Crea un intent amb la pantalla de reserves
-        String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+        String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE)+SEPARADOR+items.get(posicioReserva).getISBN();
         Intent i = new Intent(context, Reserves.class);
         i.putExtra(EXTRA_MESSAGE, extrasMessage);
         context.startActivity(i);
