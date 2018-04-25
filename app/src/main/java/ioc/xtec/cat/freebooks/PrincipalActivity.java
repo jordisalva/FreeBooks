@@ -205,7 +205,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
         } else if (id == R.id.app_bookings) {
             // TODO Al fer click t'ha de portar a la pantalla de reserves (Falta implementar)
-            showToast("Encara no implementat, es mostraran els llibres reservats");
+            // Crea un intent amb la pantalla de reserves
+            String extrasMessage = getIntent().getStringExtra(EXTRA_MESSAGE);
+            Intent i = new Intent(PrincipalActivity.this, Reserves.class);
+            i.putExtra(EXTRA_MESSAGE, extrasMessage);
+            getApplicationContext().startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);
