@@ -217,6 +217,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                                         context, Adaptador.this, anyInici, mesInici, diaInici);
                                 long now = System.currentTimeMillis() - 1000;
                                 datePickerDialog.getDatePicker().setMinDate(now);
+                                datePickerDialog.getDatePicker().setMaxDate(now+(1000*60*60*24*21));
                                 datePickerDialog.setTitle("Indica la data de reserva");
                                 // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
                                 datePickerDialog.show();
@@ -293,6 +294,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 String codiRequestXifrat = "";
                 ConnexioServidor connexioServidor = new ConnexioServidor(context);
                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                int reservesUser;
                 try {
                     codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                 } catch (Exception ex) {
@@ -301,7 +303,15 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
                 if (resposta.equals("OK")) {
+                    String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+
                     String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
+                    try {
+                        codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+
                     try {
                         codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
                     } catch (Exception ex) {

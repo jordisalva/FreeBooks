@@ -1,5 +1,7 @@
 package ioc.xtec.cat.freebooks;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -45,8 +47,9 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
     TextView dataReserva;
     TextView dataReservaLabel;
 
-
     String llistaReserves;
+    String isbn;
+    String isbn1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,11 +136,13 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
                                 if (cont == 0) {
                                     titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
+                                    isbn1 = reserva.split(SEPARADOR)[3].toString();
                                     dataReserva1.setText(reserva.split(SEPARADOR)[4].toString());
                                 } else if (cont == 1) {
                                     titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
                                     dataReserva.setText(reserva.split(SEPARADOR)[4].toString());
+                                    isbn = reserva.split(SEPARADOR)[3].toString();
                                 }
                                 cont++;
                             }
@@ -205,41 +210,116 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
      * @param v amb el view on s'ha fet click
      */
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
         if (v == btnEditaReserva) {
             // TODO Ha de poder editar la data de la reserva
-        } else if (v == btnAnulaReserva) {
-            // TODO Ha d'anular la reserva
-            Thread thread = new Thread(new Runnable() {
+        } else if (v == btnAnulaReserva || v == btnAnulaReserva1) {
+            String titolAEsborrar = "";
+            // TODO Ha d'anular la reserva.
+            if (v == btnAnulaReserva) {
+                titolAEsborrar = titleReserva.getText().toString();
+            } else if (v == btnAnulaReserva1) {
+                titolAEsborrar = titleReserva1.getText().toString();
+            }
 
-                @Override
-                public void run() {
-                    SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-                    String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
-                    String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
-                    String codiRequestXifrat = "";
-                    ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
-                    try {
-                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
-                    } catch (Exception ex) {
-                        System.err.println("Error al encriptar: " + ex);
-                    }
-                    String resposta = connexioServidor.consulta(codiRequestXifrat);
-                    if (resposta.equals("OK")) {
-                        String removeReservation = "removeReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[2];
-                        try {
-                            codiRequestXifrat = encriptaDades(removeReservation, (SecretKeySpec) sKey, ALGORISME);
-                        } catch (Exception ex) {
-                            System.err.println("Error al encriptar: " + ex);
+            // Crea un missatge d'alerta
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    Reserves.this);
+
+            // Títol del missatge d'alerta
+            alertDialogBuilder.setTitle("Anul·lar Reserva: ");
+
+            // Defineix el missatge de l'alerta
+            alertDialogBuilder
+                    .setMessage("Vols anul·lar la reserva del llibre: " +
+                            titolAEsborrar + "?")
+                    .setCancelable(false)
+                    .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            String isbnABorrar = "";
+                            if (v == btnAnulaReserva) {
+                                isbnABorrar = isbn;
+
+                                titleReserva.setVisibility(View.GONE);
+                                autorReserva.setVisibility(View.GONE);
+                                dataReserva.setVisibility(View.GONE);
+                                dataReservaLabel.setVisibility(View.GONE);
+                                btnEditaReserva.setVisibility(View.GONE);
+                                btnAnulaReserva.setVisibility(View.GONE);
+                                thumbnailReserva.setVisibility(View.GONE);
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showToast("No hi ha reserves...");
+                                    }
+                                });
+
+                            } else if (v == btnAnulaReserva1) {
+                                isbnABorrar = isbn1;
+
+                                titleReserva1.setVisibility(View.GONE);
+                                autorReserva1.setVisibility(View.GONE);
+                                dataReserva1.setVisibility(View.GONE);
+                                dataReservaLabel1.setVisibility(View.GONE);
+                                btnEditaReserva1.setVisibility(View.GONE);
+                                btnAnulaReserva1.setVisibility(View.GONE);
+                                thumbnailReserva1.setVisibility(View.GONE);
+                            }
+
+                            final String finalIsbnABorrar = isbnABorrar;
+                            Thread thread = new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                                    String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                                    String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                                    String codiRequestXifrat = "";
+                                    ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                                    try {
+                                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                                    } catch (Exception ex) {
+                                        System.err.println("Error al encriptar: " + ex);
+                                    }
+                                    String resposta = connexioServidor.consulta(codiRequestXifrat);
+                                    if (resposta.equals("OK")) {
+                                        String removeReservation = "removeReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + finalIsbnABorrar;
+                                        try {
+                                            codiRequestXifrat = encriptaDades(removeReservation, (SecretKeySpec) sKey, ALGORISME);
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    showToast("Reserva eliminada correctament...");
+                                                    if (!titleReserva1.isShown() && !titleReserva.isShown()) {
+                                                        showToast("No hi ha reserves...");
+                                                    }
+                                                }
+                                            });
+                                        } catch (Exception ex) {
+                                            System.err.println("Error al encriptar: " + ex);
+                                        }
+                                        resposta = connexioServidor.consulta(codiRequestXifrat);
+                                    } else {
+                                        //TODO resposta si l'usuari no està logat
+                                    }
+
+                                }
+                            });
+                            thread.start();
                         }
-                        resposta = connexioServidor.consulta(codiRequestXifrat);
-                    } else {
-                        //TODO resposta si l'usuari no està logat
-                    }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
 
-                }
-            });
-            thread.start();
+            // Crea un missatge d'alerta
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // Mostra el missatge d'alerta
+            alertDialog.show();
 
         } else if (v == btnTornarReserves) {
             // Torna a la pantalla principal
@@ -274,4 +354,5 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
         startActivity(i);
         finish();
     }
+
 }
