@@ -52,6 +52,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
     private ElMeuViewHolder viewHolder;
     private int posicioReserva;
     private int reservesUser;
+    private String errorReserva;
 
     /**
      * Creem el constructor
@@ -234,11 +235,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                     }
                 });
                 thread.start();
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
                 if (reservesUser >= 2) {
                     Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
@@ -333,8 +329,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
     @Override
     public void onDateSet(DatePicker view, int any, int mes, int dia) {
         mes = mes + 1;
-        Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
-        Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
         final String dataReserva = any+"-"+mes+"-"+dia;
         Thread thread = new Thread(new Runnable() {
 
@@ -354,21 +348,16 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
                 if (resposta.equals("OK")) {
-                    String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+                    //String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
 
                     String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
-                    try {
-                        codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
-                    } catch (Exception ex) {
-                        System.err.println("Error al encriptar: " + ex);
-                    }
 
                     try {
                         codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
                     } catch (Exception ex) {
                         System.err.println("Error al encriptar: " + ex);
                     }
-                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                    errorReserva = connexioServidor.consulta(codiRequestXifrat);
                 } else {
                     //TODO resposta si l'usuari no està logat
                 }
@@ -376,11 +365,24 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         });
         thread.start();
 
-        // Crea un intent amb la pantalla de reserves
-        String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
-        Intent i = new Intent(context, Reserves.class);
-        i.putExtra(EXTRA_MESSAGE, extrasMessage);
-        context.startActivity(i);
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (errorReserva.equals("FAILNOTUNIQUE")) {
+            Toast.makeText(context, "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
+        } else if (errorReserva.equals("OK")) {
+            Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
+            // Crea un intent amb la pantalla de reserves
+            String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+            Intent i = new Intent(context, Reserves.class);
+            i.putExtra(EXTRA_MESSAGE, extrasMessage);
+            context.startActivity(i);
+        }
+
     }
 
     /**
