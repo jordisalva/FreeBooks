@@ -382,7 +382,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             i.putExtra(EXTRA_MESSAGE, extrasMessage);
             context.startActivity(i);
         }
-
     }
 
     /**
