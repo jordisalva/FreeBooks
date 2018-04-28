@@ -30,6 +30,7 @@ import java.util.Calendar;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static ioc.xtec.cat.freebooks.CriptoUtils.desencriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
@@ -50,6 +51,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
     private DatePickerDialog datePickerDialog;
     private ElMeuViewHolder viewHolder;
     private int posicioReserva;
+    private int reservesUser;
 
     /**
      * Creem el constructor
@@ -193,50 +195,99 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         viewHolder.vButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                // Crea un missatge d'alerta
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        context);
+                Thread thread = new Thread(new Runnable() {
 
-                // Títol del missatge d'alerta
-                alertDialogBuilder.setTitle("Reservar: ");
+                    @Override
+                    public void run() {
+                        SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                        String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                        String codiRequestXifrat = "";
+                        ConnexioServidor connexioServidor = new ConnexioServidor(context);
+                        String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                        String reservesUserString = "";
+                        try {
+                            codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al encriptar: " + ex);
+                        }
 
-                // Defineix el missatge de l'alerta
-                alertDialogBuilder
-                        .setMessage("Vols reservar el llibre: " +
-                                items.get(position).getTitol() + "? \n\n" +
-                                "Al fer click a \"Sí\" hauras de triar el dia que vols recollir el llibre")
-                        .setCancelable(false)
-                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                posicioReserva = position;
-                                final Calendar c = Calendar.getInstance();
-                                anyInici = c.get(Calendar.YEAR);
-                                mesInici = c.get(Calendar.MONTH);
-                                diaInici = c.get(Calendar.DAY_OF_MONTH);
-                                datePickerDialog = new DatePickerDialog(
-                                        context, Adaptador.this, anyInici, mesInici, diaInici);
-                                long now = System.currentTimeMillis() - 1000;
-                                datePickerDialog.getDatePicker().setMinDate(now);
-                                datePickerDialog.getDatePicker().setMaxDate(now+(1000*60*60*24*21));
-                                datePickerDialog.setTitle("Indica la data de reserva");
-                                // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
-                                datePickerDialog.show();
-                                //viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
-                                //viewHolder.vtext.setText("Reservat!");
-                                //viewHolder.vButton.setVisibility(View.GONE);
+                        String resposta = connexioServidor.consulta(codiRequestXifrat);
+                        if (resposta.equals("OK")) {
+                            String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+
+                            try {
+                                codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
+                                try {
+                                    reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                                } catch (Exception ex) {
+                                    System.err.println("Error al desencriptar: " + ex);
+                                }
+                                reservesUser = Integer.parseInt(reservesUserString);
+                                //reservesUser = 2;
+                            } catch (Exception ex) {
+                                System.err.println("Error al encriptar: " + ex);
                             }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                            resposta = connexioServidor.consulta(codiRequestXifrat);
+                        } else {
+                            //TODO resposta si l'usuari no està logat
+                        }
+                    }
+                });
+                thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-                // Crea un missatge d'alerta
-                AlertDialog alertDialog = alertDialogBuilder.create();
+                if (reservesUser >= 2) {
+                    Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Crea un missatge d'alerta
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            context);
 
-                // Mostra el missatge d'alerta
-                alertDialog.show();
+                    // Títol del missatge d'alerta
+                    alertDialogBuilder.setTitle("Reservar: ");
+
+                    // Defineix el missatge de l'alerta
+                    alertDialogBuilder
+                            .setMessage("Vols reservar el llibre: " +
+                                    items.get(position).getTitol() + "? \n\n" +
+                                    "Al fer click a \"Sí\" hauras de triar el dia que vols recollir el llibre")
+                            .setCancelable(false)
+                            .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    posicioReserva = position;
+                                    final Calendar c = Calendar.getInstance();
+                                    anyInici = c.get(Calendar.YEAR);
+                                    mesInici = c.get(Calendar.MONTH);
+                                    diaInici = c.get(Calendar.DAY_OF_MONTH);
+                                    datePickerDialog = new DatePickerDialog(
+                                            context, Adaptador.this, anyInici, mesInici, diaInici);
+                                    long now = System.currentTimeMillis() - 1000;
+                                    datePickerDialog.getDatePicker().setMinDate(now);
+                                    datePickerDialog.getDatePicker().setMaxDate(now+(1000*60*60*24*21));
+                                    datePickerDialog.setTitle("Indica la data de reserva");
+                                    // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
+                                    datePickerDialog.show();
+                                    //viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
+                                    //viewHolder.vtext.setText("Reservat!");
+                                    //viewHolder.vButton.setVisibility(View.GONE);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    // Crea un missatge d'alerta
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    // Mostra el missatge d'alerta
+                    alertDialog.show();
+                }
             }
         });
     }

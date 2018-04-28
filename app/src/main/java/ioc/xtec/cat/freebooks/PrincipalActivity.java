@@ -192,6 +192,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             // Tanca la sessió
             tancaSessio();
         } else if (id == R.id.app_refresh) {
+
             // Refresca la llista de llibres
 
             // Amaga el recyclerView

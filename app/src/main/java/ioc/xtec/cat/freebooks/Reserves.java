@@ -1,6 +1,7 @@
 package ioc.xtec.cat.freebooks;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,10 +9,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,7 +24,7 @@ import static ioc.xtec.cat.freebooks.CriptoUtils.desencriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
-public class Reserves extends AppCompatActivity implements View.OnClickListener {
+public class Reserves extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     public static final String SEPARADOR = "Sep@!-@rad0R";
     public static final String ALGORISME = "AES/ECB/PKCS5Padding";
@@ -51,6 +55,14 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
     String isbn;
     String isbn1;
 
+    int contReserves;
+    int contReserves2;
+
+    private int anyInici, mesInici, diaInici;
+    private DatePickerDialog datePickerDialog;
+
+    String modificatISBN;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +70,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
 
         Intent iFinalitza = new Intent("finish");
         sendBroadcast(iFinalitza);
+
+        contReserves = 0;
 
         imatgeReserves = ((ImageView) findViewById(R.id.imageReserves));
         imatgeReserves.setColorFilter(Color.GRAY);
@@ -130,24 +144,25 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
                     if (!llistaReserves.isEmpty()) {
                         // Obtenim les dades de cada reserva
                         String[] reserves = llistaReserves.split("~");
-                        int cont = 0;
                         for (String reserva : reserves) {
                             if (reserva.split(SEPARADOR)[0].equals(extras.split(SEPARADOR)[0])) {
-                                if (cont == 0) {
+                                if (contReserves == 0) {
                                     titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
                                     isbn1 = reserva.split(SEPARADOR)[3].toString();
-                                    dataReserva1.setText(reserva.split(SEPARADOR)[4].toString());
-                                } else if (cont == 1) {
+                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                    dataReserva1.setText(dataAmbFormatString);
+                                } else if (contReserves == 1) {
                                     titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
-                                    dataReserva.setText(reserva.split(SEPARADOR)[4].toString());
+                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                    dataReserva.setText(dataAmbFormatString);
                                     isbn = reserva.split(SEPARADOR)[3].toString();
                                 }
-                                cont++;
+                                contReserves++;
                             }
                         }
-                        final int finalCont = cont;
+                        final int finalCont = contReserves;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -211,8 +226,27 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
      */
     @Override
     public void onClick(final View v) {
-        if (v == btnEditaReserva) {
+        if (v == btnEditaReserva || v == btnEditaReserva1) {
             // TODO Ha de poder editar la data de la reserva
+            if (v == btnEditaReserva) {
+                modificatISBN = isbn;
+            } else if (v == btnEditaReserva1) {
+                modificatISBN = isbn1;
+            }
+
+            final Calendar c = Calendar.getInstance();
+            anyInici = c.get(Calendar.YEAR);
+            mesInici = c.get(Calendar.MONTH);
+            diaInici = c.get(Calendar.DAY_OF_MONTH);
+            datePickerDialog = new DatePickerDialog(
+                    Reserves.this, Reserves.this, anyInici, mesInici, diaInici);
+            long now = System.currentTimeMillis() - 1000;
+            datePickerDialog.getDatePicker().setMinDate(now);
+            datePickerDialog.getDatePicker().setMaxDate(now + (1000 * 60 * 60 * 24 * 21));
+            datePickerDialog.setTitle("Indica la data de reserva");
+            // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
+            datePickerDialog.show();
+
         } else if (v == btnAnulaReserva || v == btnAnulaReserva1) {
             String titolAEsborrar = "";
             // TODO Ha d'anular la reserva.
@@ -247,13 +281,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
                                 btnEditaReserva.setVisibility(View.GONE);
                                 btnAnulaReserva.setVisibility(View.GONE);
                                 thumbnailReserva.setVisibility(View.GONE);
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showToast("No hi ha reserves...");
-                                    }
-                                });
 
                             } else if (v == btnAnulaReserva1) {
                                 isbnABorrar = isbn1;
@@ -290,8 +317,9 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
                                             runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    showToast("Reserva eliminada correctament...");
-                                                    if (!titleReserva1.isShown() && !titleReserva.isShown()) {
+                                                    showToast("Reserva anul·lada correctament...");
+                                                    contReserves--;
+                                                    if (contReserves == 0) {
                                                         showToast("No hi ha reserves...");
                                                     }
                                                 }
@@ -355,4 +383,190 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener 
         finish();
     }
 
+
+    /**
+     * Converteix la data a un format llegible per l'usuari
+     *
+     * @param dataSenseFormat data obtinguda amb format estàndard
+     * @return data amb format personalitzat
+     */
+    public static String dataAmbFormat(String dataSenseFormat) {
+        String dataAmbFormat = "";
+        // Obtenim el dia de la setmana i li donem format
+        String weekDay = dataSenseFormat.substring(0, 3);
+        switch (weekDay) {
+            case "Mon":
+                dataAmbFormat = "Dilluns, ";
+                break;
+            case "Tue":
+                dataAmbFormat = "Dimarts, ";
+                break;
+            case "Wed":
+                dataAmbFormat = "Dimecres, ";
+                break;
+            case "Thu":
+                dataAmbFormat = "Dijous, ";
+                break;
+            case "Fri":
+                dataAmbFormat = "Divendres, ";
+                break;
+            case "Sat":
+                dataAmbFormat = "Dissabte, ";
+                break;
+            case "Sun":
+                dataAmbFormat = "Diumenge, ";
+                break;
+        }
+        // Obtenim el dia
+        String day = dataSenseFormat.substring(8, 10);
+        // Obtenim el mes i li donem format
+        String month = dataSenseFormat.substring(4, 7);
+        switch (month) {
+            case "Jan":
+                dataAmbFormat = dataAmbFormat + day + " de gener";
+                break;
+            case "Feb":
+                dataAmbFormat = dataAmbFormat + day + " de febrer";
+                break;
+            case "Mar":
+                dataAmbFormat = dataAmbFormat + day + " de març";
+                break;
+            case "Apr":
+                dataAmbFormat = dataAmbFormat + day + " d'abril";
+                break;
+            case "May":
+                dataAmbFormat = dataAmbFormat + day + " de maig";
+                break;
+            case "Jun":
+                dataAmbFormat = dataAmbFormat + day + " de juny";
+                break;
+            case "Jul":
+                dataAmbFormat = dataAmbFormat + day + " de juliol";
+                break;
+            case "Aug":
+                dataAmbFormat = dataAmbFormat + day + " d'agost";
+                break;
+            case "Sep":
+                dataAmbFormat = dataAmbFormat + day + " de setembre";
+                break;
+            case "Oct":
+                dataAmbFormat = dataAmbFormat + day + " d'octubre";
+                break;
+            case "Nov":
+                dataAmbFormat = dataAmbFormat + day + " de novembre";
+                break;
+            case "Dec":
+                dataAmbFormat = dataAmbFormat + day + " de desembre";
+                break;
+        }
+        return dataAmbFormat;
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int any, int mes, int dia) {
+        mes = mes + 1;
+        //Toast.makeText(getApplicationContext(), "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
+        final String dataReservaDataSet = any + "-" + mes + "-" + dia;
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                int reservesUser;
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+
+                    String editReservationDate = "editReservationDate" + SEPARADOR + dataReservaDataSet + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + modificatISBN;
+                    try {
+                        codiRequestXifrat = encriptaDades(editReservationDate, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+
+                    try {
+                        codiRequestXifrat = encriptaDades(editReservationDate, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                            String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                            String codiRequestXifrat = "";
+                            ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                            try {
+                                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                            } catch (Exception ex) {
+                                System.err.println("Error al encriptar: " + ex);
+                            }
+                            String resposta = connexioServidor.consulta(codiRequestXifrat);
+                            if (resposta.equals("OK")) {
+                                String getReserves = "getReservations";
+                                try {
+                                    codiRequestXifrat = encriptaDades(getReserves, (SecretKeySpec) sKey, ALGORISME);
+                                    llistaReserves = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                                } catch (Exception ex) {
+                                    System.err.println("Error al desencriptar: " + ex);
+                                }
+                                if (!llistaReserves.isEmpty()) {
+                                    // Obtenim les dades de cada reserva
+                                    String[] reserves = llistaReserves.split("~");
+                                    contReserves2 = 0;
+                                    for (String reserva : reserves) {
+                                        if (reserva.split(SEPARADOR)[0].equals(extras.split(SEPARADOR)[0])) {
+                                            if (contReserves2 == 0) {
+                                                titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
+                                                autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
+                                                isbn1 = reserva.split(SEPARADOR)[3].toString();
+                                                String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                                dataReserva1.setText(dataAmbFormatString);
+                                            } else if (contReserves2 == 1) {
+                                                titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
+                                                autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
+                                                String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                                dataReserva.setText(dataAmbFormatString);
+                                                isbn = reserva.split(SEPARADOR)[3].toString();
+                                            }
+                                            contReserves2++;
+                                        }
+                                    }
+                                    //final int finalCont = contReserves;
+
+                                }
+
+                                resposta = connexioServidor.consulta(codiRequestXifrat);
+                            } else {
+                                //TODO resposta si l'usuari no està logat
+                            }
+
+                        }
+                    });
+                    thread.start();
+
+
+                } else {
+                    //TODO resposta si l'usuari no està logat
+                }
+            }
+        });
+        thread.start();
+
+
+    }
 }
