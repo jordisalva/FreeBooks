@@ -55,6 +55,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     SearchView searchView;
     SearchManager searchManager;
     BroadcastReceiver broadcast_reciever;
+    String extrasInici;
 
     /**
      * Accions en la creació
@@ -88,6 +89,8 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         // Crea un intent amb la pantalla de login
         i = new Intent(PrincipalActivity.this, MainActivity.class);
 
+        extrasInici = getIntent().getStringExtra("Inici");
+
         //Posem la barra de progrés amb un màxim de 100
         barra_progres = (ProgressBar) findViewById(R.id.progressBar);
         barra_progres.setMax(100);
@@ -113,7 +116,6 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
 
         // Executem la tasca per carregar els llibres
         new CarregaLlibres().execute((Void) null);
-
     }
 
     /**
@@ -126,7 +128,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         bookingsMenuItem = menu.findItem(R.id.app_bookings);
-        bookingsMenuItem.getIcon().setTint(Color.WHITE);
+        if (teReserves()) {
+            bookingsMenuItem.getIcon().setTint(Color.GREEN);
+        } else {
+            bookingsMenuItem.getIcon().setTint(Color.WHITE);
+        }
         searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.app_search);
@@ -187,13 +193,17 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             String extrasMessage = getIntent().getStringExtra(EXTRA_MESSAGE);
             Intent iEditUser = new Intent(PrincipalActivity.this, EditaUsuariActivity.class);
             iEditUser.putExtra(EXTRA_MESSAGE, extrasMessage);
+            iEditUser.putExtra("Inici", "noinici");
             startActivity(iEditUser);
         } else if (id == R.id.app_logout) {
             // Tanca la sessió
             tancaSessio();
         } else if (id == R.id.app_refresh) {
-
             // Refresca la llista de llibres
+
+            //Afegim l'adaptador amb les dades
+            adapter = new Adaptador(this, llistaLlibres);
+            recyclerView.setAdapter(adapter);
 
             // Amaga el recyclerView
             recyclerView.setVisibility(View.GONE);
@@ -205,11 +215,11 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
             new CarregaLlibres().execute((Void) null);
 
         } else if (id == R.id.app_bookings) {
-            // TODO Al fer click t'ha de portar a la pantalla de reserves (Falta implementar)
             // Crea un intent amb la pantalla de reserves
             String extrasMessage = getIntent().getStringExtra(EXTRA_MESSAGE);
             Intent i = new Intent(PrincipalActivity.this, Reserves.class);
             i.putExtra(EXTRA_MESSAGE, extrasMessage);
+            i.putExtra("Inici", "noinici");
             getApplicationContext().startActivity(i);
         }
 
@@ -413,7 +423,10 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
          */
         protected void onPostExecute(String result) {
             // Després de cada modificació a la font de les dades, hem de notificar-ho a l'adaptador
-            adapter.notifyDataSetChanged();
+
+            if (!extrasInici.equals("inici")) {
+                adapter.notifyDataSetChanged();
+            }
             // Mostrem el recyclerView
             recyclerView.setVisibility(View.VISIBLE);
             // Amaguem la barra de progrés
@@ -428,6 +441,65 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
     protected void onStop() {
         unregisterReceiver(broadcast_reciever);
         super.onStop();
+    }
+
+
+    /**
+     * Verifica si existeixen reserves per l'usuari actual
+     *
+     * @return boleà per verificar si existeixen reserves per l'usuari actual
+     */
+    public boolean teReserves () {
+        final int[] reservesUser = new int[1];
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                String reservesUserString = "";
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+
+                    try {
+                        codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
+                        try {
+                            reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al desencriptar: " + ex);
+                        }
+                        reservesUser[0] = Integer.parseInt(reservesUserString);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean teReserves = false;
+        if (reservesUser[0] > 0) {
+         teReserves = true;
+        }
+
+        return teReserves;
     }
 
 

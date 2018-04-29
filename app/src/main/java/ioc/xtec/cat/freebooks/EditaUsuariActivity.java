@@ -94,6 +94,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
         } else {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             i.putExtra(EXTRA_MESSAGE, extra);
+            i.putExtra("Inici", "noinici");
             startActivity(i);
             finish();
         }
@@ -108,6 +109,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
         super.onBackPressed();
         String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
         i.putExtra(EXTRA_MESSAGE, extra);
+        i.putExtra("Inici", "noinici");
         startActivity(i);
         finish();
     }
@@ -188,6 +190,7 @@ public class EditaUsuariActivity extends AppCompatActivity implements View.OnCli
                                 showToast("Dades guardades correctament");
                                 String extra = userText.getText() + SEPARADOR + "Mobile";
                                 i.putExtra(EXTRA_MESSAGE, extra);
+                                i.putExtra("Inici", "noinici");
                                 startActivity(i);
                                 finish();
 

@@ -138,8 +138,8 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             // Si no hi ha imatge carrega una imatge per defecte
         } else {
             viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
-            viewHolder.vThumbnail.getLayoutParams().height = 220;
-            viewHolder.vThumbnail.getLayoutParams().width = 220;
+            viewHolder.vThumbnail.getLayoutParams().height = 250;
+            viewHolder.vThumbnail.getLayoutParams().width = 250;
             RelativeLayout.LayoutParams layoutarams = (RelativeLayout.LayoutParams) viewHolder.vThumbnail.getLayoutParams();
             layoutarams.leftMargin = 0;
         }
@@ -224,17 +224,21 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                                     System.err.println("Error al desencriptar: " + ex);
                                 }
                                 reservesUser = Integer.parseInt(reservesUserString);
-                                //reservesUser = 2;
                             } catch (Exception ex) {
                                 System.err.println("Error al encriptar: " + ex);
                             }
                             resposta = connexioServidor.consulta(codiRequestXifrat);
                         } else {
-                            //TODO resposta si l'usuari no està logat
+                            Toast.makeText(context, "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
                 thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 if (reservesUser >= 2) {
                     Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
@@ -359,7 +363,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                     }
                     errorReserva = connexioServidor.consulta(codiRequestXifrat);
                 } else {
-                    //TODO resposta si l'usuari no està logat
+                    Toast.makeText(context, "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                 }
             }
         });

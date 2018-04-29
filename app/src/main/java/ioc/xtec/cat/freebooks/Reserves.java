@@ -4,9 +4,13 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -15,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.crypto.SecretKey;
@@ -28,6 +33,10 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     public static final String EXTRA_MESSAGE = "ioc.xtec.cat.freeboks.MESSAGE";
     public static final String SEPARADOR = "Sep@!-@rad0R";
     public static final String ALGORISME = "AES/ECB/PKCS5Padding";
+    public static final String SEPARADOR_IMATGE = "@LENGTH@";
+
+    // Llista de llibres
+    private ArrayList<Llibre> llistaLlibres;
 
     // Variable amb l'intent
     Intent i;
@@ -70,6 +79,16 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
         Intent iFinalitza = new Intent("finish");
         sendBroadcast(iFinalitza);
+
+        if (!teReserves()) {
+            showToast("No hi ha reserves...");
+        }
+
+        // Preparem la font de les dades
+        llistaLlibres = new ArrayList<Llibre>();
+
+        // Executem la tasca per carregar els llibres
+        new CarregaLlibres().execute((Void) null);
 
         contReserves = 0;
 
@@ -117,8 +136,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         // Crea un intent amb la pantalla de login
         i = new Intent(Reserves.this, PrincipalActivity.class);
 
-        // TODO Ha de mostrar la llista de reserves de l'usuari
-        Thread thread = new Thread(new Runnable() {
+        // Mostra la llista de reserves de l'usuari
+        final Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
@@ -142,6 +161,10 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                         System.err.println("Error al desencriptar: " + ex);
                     }
                     if (!llistaReserves.isEmpty()) {
+                        // Obtenim la llista de llibres
+                        ArrayList<String> ar1 = getIntent().getExtras().getStringArrayList("LlistaLlibres");
+                        // String amb l'imatge de portada
+                        String imatgeString="";
                         // Obtenim les dades de cada reserva
                         String[] reserves = llistaReserves.split("~");
                         for (String reserva : reserves) {
@@ -149,15 +172,75 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                 if (contReserves == 0) {
                                     titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
-                                    isbn1 = reserva.split(SEPARADOR)[3].toString();
                                     String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
                                     dataReserva1.setText(dataAmbFormatString);
+                                    isbn1 = reserva.split(SEPARADOR)[3].toString();
+                                    try {
+                                        Thread.sleep(100);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    for (int i = 0; i < llistaLlibres.size(); i++) {
+                                        if (llistaLlibres.get(i).getISBN().equals(isbn1)) {
+                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
+                                        }
+                                    }
+                                    // String amb l'imatge en base64
+                                    final String base64StringImage = imatgeString;
+                                    Bitmap decodedByte = null;
+                                    try {
+                                        // Decodifica l'imatge
+                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    final Bitmap finalDecodedByte = decodedByte;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            thumbnailReserva1.setImageBitmap(finalDecodedByte);
+                                            if (!base64StringImage.equals("")) {
+                                                thumbnailReserva1.setBackground(null);
+                                            }
+                                        }
+                                    });
                                 } else if (contReserves == 1) {
                                     titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
                                     autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
                                     String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
                                     dataReserva.setText(dataAmbFormatString);
                                     isbn = reserva.split(SEPARADOR)[3].toString();
+                                    try {
+                                        Thread.sleep(100);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    for (int i = 0; i < llistaLlibres.size(); i++) {
+                                        if (llistaLlibres.get(i).getISBN().equals(isbn)) {
+                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
+                                        }
+                                    }
+                                    // String amb l'imatge en base64
+                                    final String base64StringImage = imatgeString;
+                                    Bitmap decodedByte = null;
+                                    try {
+                                        // Decodifica l'imatge
+                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    final Bitmap finalDecodedByte = decodedByte;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            thumbnailReserva.setImageBitmap(finalDecodedByte);
+                                            if (!base64StringImage.equals("")) {
+                                                thumbnailReserva.setBackground(null);
+                                            }
+                                        }
+                                    });
                                 }
                                 contReserves++;
                             }
@@ -211,7 +294,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
                     resposta = connexioServidor.consulta(codiRequestXifrat);
                 } else {
-                    //TODO resposta si l'usuari no està logat
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -227,7 +310,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onClick(final View v) {
         if (v == btnEditaReserva || v == btnEditaReserva1) {
-            // TODO Ha de poder editar la data de la reserva
             if (v == btnEditaReserva) {
                 modificatISBN = isbn;
             } else if (v == btnEditaReserva1) {
@@ -249,7 +331,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
         } else if (v == btnAnulaReserva || v == btnAnulaReserva1) {
             String titolAEsborrar = "";
-            // TODO Ha d'anular la reserva.
             if (v == btnAnulaReserva) {
                 titolAEsborrar = titleReserva.getText().toString();
             } else if (v == btnAnulaReserva1) {
@@ -329,7 +410,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                         }
                                         resposta = connexioServidor.consulta(codiRequestXifrat);
                                     } else {
-                                        //TODO resposta si l'usuari no està logat
+                                        Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                                     }
 
                                 }
@@ -353,6 +434,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
             // Torna a la pantalla principal
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             i.putExtra(EXTRA_MESSAGE, extra);
+            i.putExtra("Inici", "noinici");
             startActivity(i);
             finish();
         }
@@ -379,6 +461,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         // Torna a la pantalla principal
         String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
         i.putExtra(EXTRA_MESSAGE, extra);
+        i.putExtra("Inici", "noinici");
         startActivity(i);
         finish();
     }
@@ -546,13 +629,12 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                             contReserves2++;
                                         }
                                     }
-                                    //final int finalCont = contReserves;
 
                                 }
 
                                 resposta = connexioServidor.consulta(codiRequestXifrat);
                             } else {
-                                //TODO resposta si l'usuari no està logat
+                                Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -561,7 +643,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
 
                 } else {
-                    //TODO resposta si l'usuari no està logat
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -569,4 +651,164 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
 
     }
+
+    /**
+     * Verifica si existeixen reserves per l'usuari actual
+     *
+     * @return boleà per verificar si existeixen reserves per l'usuari actual
+     */
+    public boolean teReserves() {
+        final int[] reservesUser = new int[1];
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                String reservesUserString = "";
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+
+                    try {
+                        codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
+                        try {
+                            reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al desencriptar: " + ex);
+                        }
+                        reservesUser[0] = Integer.parseInt(reservesUserString);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean teReserves = false;
+        if (reservesUser[0] > 0) {
+            teReserves = true;
+        }
+
+        return teReserves;
+    }
+
+
+    /**
+     * AsyncTask que carrega les dades dels llibres del servidor, rep Strings com paràmetre
+     * d'entrada, actualitza el progrés amb Integers i no retorna res
+     */
+    private class CarregaLlibres extends AsyncTask<Void, Integer, String> {
+        final SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+        String codiRequestXifrat = "";
+
+        protected String doInBackground(Void... voids) {
+            // Borrem la llista antiga de llibres
+            llistaLlibres.clear();
+            // Realitzem la connexió amb el servidor
+            ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+            //Primer revisem si l'usuari està logat
+            String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+            try {
+                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+            } catch (Exception ex) {
+                System.err.println("Error al encriptar: " + ex);
+            }
+            String resposta = connexioServidor.consulta(codiRequestXifrat);
+            if (resposta.equals("OK")) {
+                // El servidor retorna la llista de llibres en un string
+                String llistaBooks = "getBooksDesktop";
+                try {
+                    codiRequestXifrat = encriptaDades(llistaBooks, (SecretKeySpec) sKey, ALGORISME);
+                    // Anirem fent connexions al servidor demanant la llista de llibres, fins que aquesta es pugui desencriptar correctament
+                    while (llistaBooks.equals("getBooksDesktop")) {
+                        try {
+                            llistaBooks = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al desencriptar: " + ex);
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+                // Si la llista no és buida carreguem els llibres
+                if (!llistaBooks.isEmpty()) {
+                    String[] llibresArray = llistaBooks.split("~");
+                    int midaArray = llibresArray.length;
+                    // Recorrem l'array de llibres
+                    for (int i = 0; i < midaArray; i++) {
+                        try {
+                            llistaLlibres.add(new Llibre(llibresArray[i].split(SEPARADOR)[0], llibresArray[i].split(SEPARADOR)[1],
+                                    llibresArray[i].split(SEPARADOR)[2], llibresArray[i].split(SEPARADOR)[3], llibresArray[i].split(SEPARADOR)[4],
+                                    llibresArray[i].split(SEPARADOR)[5], llibresArray[i].split(SEPARADOR)[6], llibresArray[i].split(SEPARADOR)[7]));
+                        } catch (Exception ex) {
+                            System.err.println("Error al afegir llibre:  " + ex);
+                        }
+
+                    }
+
+                    // Va massa ràpid a carregar les imatges i no es veu la barra de progrés
+                    // Li afegim un segon de retard perqué és vegi sempre
+                    /**try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }**/
+
+                } else {
+                    showToast("No hi ha llibres a la base de dades");
+                }
+            } else {
+                showToast("El servidor no respón, torna a fer el login més tard...");
+                startActivity(i);
+                finish();
+            }
+
+            return null;
+        }
+
+        /**
+         * S'executa abans de l'execució de la tasca
+         */
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        /**
+         * S'executa durant l'execució de la tasca
+         *
+         * @param args
+         */
+        public void onProgressUpdate(Integer... args) {
+            super.onProgressUpdate();
+        }
+
+        /**
+         * S'executa després de l'execució de la tasca
+         *
+         * @param result
+         */
+        protected void onPostExecute(String result) {
+            //
+        }
+    }
+
 }

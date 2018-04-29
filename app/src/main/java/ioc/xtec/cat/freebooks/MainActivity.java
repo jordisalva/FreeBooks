@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showToast("Usuari i contrasenya vàlids");
                                 Intent i = new Intent(MainActivity.this, PrincipalActivity.class);
                                 i.putExtra(EXTRA_MESSAGE, message);
+                                i.putExtra("Inici", "inici");
                                 startActivity(i);
                                 finish();
                             } else {

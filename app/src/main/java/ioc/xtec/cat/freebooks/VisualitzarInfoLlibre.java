@@ -173,6 +173,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         } else if (v == btnTornar) {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             i.putExtra(EXTRA_MESSAGE, extra);
+            i.putExtra("Inici", "noinici");
             startActivity(i);
             finish();
         }
@@ -199,6 +200,7 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         // Torna a la pantalla principal
         String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
         i.putExtra(EXTRA_MESSAGE, extra);
+        i.putExtra("Inici", "noinici");
         startActivity(i);
         finish();
     }
@@ -208,7 +210,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         mes = mes + 1;
         Toast.makeText(VisualitzarInfoLlibre.this, "Has reservat el llibre: \n" + textTitol.getText(), Toast.LENGTH_SHORT).show();
         Toast.makeText(VisualitzarInfoLlibre.this, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
-        // TODO S'ha de fer la crida al servidor per guardar la reserva
+
+        // Nova reserva
         final String dataReserva = any+"-"+mes+"-"+dia;
         Thread thread = new Thread(new Runnable() {
 
@@ -224,16 +227,18 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
                     System.err.println("Error al encriptar: " + ex);
                 }
                 ConnexioServidor connexioServidor = new ConnexioServidor(VisualitzarInfoLlibre.this);
+                // Crida al servidor per guardar la reserva
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
             }
         });
         thread.start();
 
-        // TODO Al finalitzar la reserva t'ha de portar a la pantalla de reserves (Falta crear-la)
+        // Al finalitzar la reserva et porta a la pantalla de reserves
         // Crea un intent amb la pantalla de reserves
         String extrasMessage = ((Activity) VisualitzarInfoLlibre.this).getIntent().getStringExtra(EXTRA_MESSAGE);
         Intent i = new Intent(VisualitzarInfoLlibre.this, Reserves.class);
         i.putExtra(EXTRA_MESSAGE, extrasMessage);
+        i.putExtra("Inici", "noinici");
         VisualitzarInfoLlibre.this.startActivity(i);
         finish();
     }
