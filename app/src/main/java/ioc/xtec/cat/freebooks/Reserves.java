@@ -51,6 +51,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     TextView autorReserva1;
     TextView dataReserva1;
     TextView dataReservaLabel1;
+    TextView llocHoraLabel1;
+    TextView llocHora1;
 
     ImageButton btnEditaReserva;
     ImageButton btnAnulaReserva;
@@ -59,6 +61,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     TextView autorReserva;
     TextView dataReserva;
     TextView dataReservaLabel;
+    TextView llocHoraLabel;
+    TextView llocHora;
 
     String llistaReserves;
     String isbn;
@@ -99,11 +103,15 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         autorReserva1 = ((TextView) findViewById(R.id.autorReserva1));
         dataReserva1 = ((TextView) findViewById(R.id.dataReserva1));
         dataReservaLabel1 = ((TextView) findViewById(R.id.dataReservaLabel1));
+        llocHoraLabel1 = ((TextView) findViewById(R.id.llocHoraLabel1));
+        llocHora1 = ((TextView) findViewById(R.id.llocHora1));
         thumbnailReserva = ((ImageView) findViewById(R.id.thumbnailReserva));
         titleReserva = ((TextView) findViewById(R.id.titleReserva));
         autorReserva = ((TextView) findViewById(R.id.autorReserva));
         dataReserva = ((TextView) findViewById(R.id.dataReserva));
         dataReservaLabel = ((TextView) findViewById(R.id.dataReservaLabel));
+        llocHoraLabel = ((TextView) findViewById(R.id.llocHoraLabel));
+        llocHora = ((TextView) findViewById(R.id.llocHora));
         // Definim els listeners
         btnTornarReserves = ((Button) findViewById(R.id.btnTornarReserves));
         btnTornarReserves.setOnClickListener(this);
@@ -125,6 +133,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         dataReservaLabel.setVisibility(View.GONE);
         btnEditaReserva.setVisibility(View.GONE);
         btnAnulaReserva.setVisibility(View.GONE);
+        llocHoraLabel.setVisibility(View.GONE);
+        llocHora.setVisibility(View.GONE);
         thumbnailReserva1.setVisibility(View.GONE);
         titleReserva1.setVisibility(View.GONE);
         autorReserva1.setVisibility(View.GONE);
@@ -132,6 +142,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         dataReservaLabel1.setVisibility(View.GONE);
         btnEditaReserva1.setVisibility(View.GONE);
         btnAnulaReserva1.setVisibility(View.GONE);
+        llocHoraLabel1.setVisibility(View.GONE);
+        llocHora1.setVisibility(View.GONE);
 
         // Crea un intent amb la pantalla de login
         i = new Intent(Reserves.this, PrincipalActivity.class);
@@ -257,6 +269,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     btnEditaReserva1.setVisibility(View.VISIBLE);
                                     btnAnulaReserva1.setVisibility(View.VISIBLE);
                                     thumbnailReserva1.setVisibility(View.VISIBLE);
+                                    llocHoraLabel1.setVisibility(View.VISIBLE);
+                                    llocHora1.setVisibility(View.VISIBLE);
                                     titleReserva.setVisibility(View.GONE);
                                     autorReserva.setVisibility(View.GONE);
                                     dataReserva.setVisibility(View.GONE);
@@ -264,6 +278,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     btnEditaReserva.setVisibility(View.GONE);
                                     btnAnulaReserva.setVisibility(View.GONE);
                                     thumbnailReserva.setVisibility(View.GONE);
+                                    llocHoraLabel.setVisibility(View.GONE);
+                                    llocHora.setVisibility(View.GONE);
                                 } else if (finalCont == 2) {
                                     titleReserva.setVisibility(View.VISIBLE);
                                     autorReserva.setVisibility(View.VISIBLE);
@@ -272,6 +288,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     thumbnailReserva.setVisibility(View.VISIBLE);
                                     btnAnulaReserva.setVisibility(View.VISIBLE);
                                     btnEditaReserva.setVisibility(View.VISIBLE);
+                                    llocHoraLabel.setVisibility(View.VISIBLE);
+                                    llocHora.setVisibility(View.VISIBLE);
                                     titleReserva1.setVisibility(View.VISIBLE);
                                     autorReserva1.setVisibility(View.VISIBLE);
                                     dataReserva1.setVisibility(View.VISIBLE);
@@ -279,6 +297,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     thumbnailReserva1.setVisibility(View.VISIBLE);
                                     btnAnulaReserva1.setVisibility(View.VISIBLE);
                                     btnEditaReserva1.setVisibility(View.VISIBLE);
+                                    llocHoraLabel1.setVisibility(View.VISIBLE);
+                                    llocHora1.setVisibility(View.VISIBLE);
                                 }
                             }
                         });
@@ -362,6 +382,9 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                 btnEditaReserva.setVisibility(View.GONE);
                                 btnAnulaReserva.setVisibility(View.GONE);
                                 thumbnailReserva.setVisibility(View.GONE);
+                                llocHoraLabel.setVisibility(View.GONE);
+                                llocHora.setVisibility(View.GONE);
+
 
                             } else if (v == btnAnulaReserva1) {
                                 isbnABorrar = isbn1;
@@ -373,6 +396,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                 btnEditaReserva1.setVisibility(View.GONE);
                                 btnAnulaReserva1.setVisibility(View.GONE);
                                 thumbnailReserva1.setVisibility(View.GONE);
+                                llocHoraLabel1.setVisibility(View.GONE);
+                                llocHora1.setVisibility(View.GONE);
                             }
 
                             final String finalIsbnABorrar = isbnABorrar;

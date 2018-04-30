@@ -52,4 +52,6 @@
     <string name="autor_de_prova">Autor de prova</string>
     <string name="_16_04_2018">16/04/2018</string>
     <string name="data_reserva">Data Recollida:</string>
+    <string name="lloc_hora_recollida">Lloc/Hora Recollida:</string>
+    <string name="carrer_del_compte_urgell_187_barcelona_de_9_45_a_15_00">Carrer del Compte Urgell, 187 (Barcelona) De 9:45 a 15:00</string>
 </resources>
