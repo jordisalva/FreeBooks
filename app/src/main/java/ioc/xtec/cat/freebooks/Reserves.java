@@ -69,7 +69,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     String isbn1;
 
     int contReserves;
-    int contReserves2;
 
     private int anyInici, mesInici, diaInici;
     private DatePickerDialog datePickerDialog;
@@ -84,242 +83,8 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         Intent iFinalitza = new Intent("finish");
         sendBroadcast(iFinalitza);
 
-        if (!teReserves()) {
-            showToast("No hi ha reserves...");
-        }
-
-        // Preparem la font de les dades
-        llistaLlibres = new ArrayList<Llibre>();
-
-        // Executem la tasca per carregar els llibres
-        new CarregaLlibres().execute((Void) null);
-
-        contReserves = 0;
-
-        imatgeReserves = ((ImageView) findViewById(R.id.imageReserves));
-        imatgeReserves.setColorFilter(Color.GRAY);
-        thumbnailReserva1 = ((ImageView) findViewById(R.id.thumbnailReserva1));
-        titleReserva1 = ((TextView) findViewById(R.id.titleReserva1));
-        autorReserva1 = ((TextView) findViewById(R.id.autorReserva1));
-        dataReserva1 = ((TextView) findViewById(R.id.dataReserva1));
-        dataReservaLabel1 = ((TextView) findViewById(R.id.dataReservaLabel1));
-        llocHoraLabel1 = ((TextView) findViewById(R.id.llocHoraLabel1));
-        llocHora1 = ((TextView) findViewById(R.id.llocHora1));
-        thumbnailReserva = ((ImageView) findViewById(R.id.thumbnailReserva));
-        titleReserva = ((TextView) findViewById(R.id.titleReserva));
-        autorReserva = ((TextView) findViewById(R.id.autorReserva));
-        dataReserva = ((TextView) findViewById(R.id.dataReserva));
-        dataReservaLabel = ((TextView) findViewById(R.id.dataReservaLabel));
-        llocHoraLabel = ((TextView) findViewById(R.id.llocHoraLabel));
-        llocHora = ((TextView) findViewById(R.id.llocHora));
-        // Definim els listeners
-        btnTornarReserves = ((Button) findViewById(R.id.btnTornarReserves));
-        btnTornarReserves.setOnClickListener(this);
-        btnEditaReserva1 = (ImageButton) findViewById(R.id.buttonEditarReserva1);
-        btnEditaReserva1.setOnClickListener(this);
-        btnAnulaReserva1 = (ImageButton) findViewById(R.id.buttonAnularReserva1);
-        btnAnulaReserva1.setOnClickListener(this);
-        btnEditaReserva = (ImageButton) findViewById(R.id.buttonEditarReserva);
-        btnEditaReserva.setOnClickListener(this);
-        btnAnulaReserva = (ImageButton) findViewById(R.id.buttonAnularReserva);
-        btnAnulaReserva.setOnClickListener(this);
-
-
-        // Inicialment ocultem totes les reserves
-        thumbnailReserva.setVisibility(View.GONE);
-        titleReserva.setVisibility(View.GONE);
-        autorReserva.setVisibility(View.GONE);
-        dataReserva.setVisibility(View.GONE);
-        dataReservaLabel.setVisibility(View.GONE);
-        btnEditaReserva.setVisibility(View.GONE);
-        btnAnulaReserva.setVisibility(View.GONE);
-        llocHoraLabel.setVisibility(View.GONE);
-        llocHora.setVisibility(View.GONE);
-        thumbnailReserva1.setVisibility(View.GONE);
-        titleReserva1.setVisibility(View.GONE);
-        autorReserva1.setVisibility(View.GONE);
-        dataReserva1.setVisibility(View.GONE);
-        dataReservaLabel1.setVisibility(View.GONE);
-        btnEditaReserva1.setVisibility(View.GONE);
-        btnAnulaReserva1.setVisibility(View.GONE);
-        llocHoraLabel1.setVisibility(View.GONE);
-        llocHora1.setVisibility(View.GONE);
-
-        // Crea un intent amb la pantalla de login
-        i = new Intent(Reserves.this, PrincipalActivity.class);
-
-        // Mostra la llista de reserves de l'usuari
-        final Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
-                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
-                String codiRequestXifrat = "";
-                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
-                try {
-                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
-                } catch (Exception ex) {
-                    System.err.println("Error al encriptar: " + ex);
-                }
-                String resposta = connexioServidor.consulta(codiRequestXifrat);
-                if (resposta.equals("OK")) {
-                    String getReserves = "getReservations";
-                    try {
-                        codiRequestXifrat = encriptaDades(getReserves, (SecretKeySpec) sKey, ALGORISME);
-                        llistaReserves = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
-                    } catch (Exception ex) {
-                        System.err.println("Error al desencriptar: " + ex);
-                    }
-                    if (!llistaReserves.isEmpty()) {
-                        // Obtenim la llista de llibres
-                        ArrayList<String> ar1 = getIntent().getExtras().getStringArrayList("LlistaLlibres");
-                        // String amb l'imatge de portada
-                        String imatgeString="";
-                        // Obtenim les dades de cada reserva
-                        String[] reserves = llistaReserves.split("~");
-                        for (String reserva : reserves) {
-                            if (reserva.split(SEPARADOR)[0].equals(extras.split(SEPARADOR)[0])) {
-                                if (contReserves == 0) {
-                                    titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
-                                    autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
-                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
-                                    dataReserva1.setText(dataAmbFormatString);
-                                    isbn1 = reserva.split(SEPARADOR)[3].toString();
-                                    try {
-                                        Thread.sleep(200);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    for (int i = 0; i < llistaLlibres.size(); i++) {
-                                        if (llistaLlibres.get(i).getISBN().equals(isbn1)) {
-                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
-                                        }
-                                    }
-                                    // String amb l'imatge en base64
-                                    final String base64StringImage = imatgeString;
-                                    Bitmap decodedByte = null;
-                                    try {
-                                        // Decodifica l'imatge
-                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
-                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    final Bitmap finalDecodedByte = decodedByte;
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            thumbnailReserva1.setImageBitmap(finalDecodedByte);
-                                            if (!base64StringImage.equals("")) {
-                                                thumbnailReserva1.setBackground(null);
-                                            }
-                                        }
-                                    });
-                                } else if (contReserves == 1) {
-                                    titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
-                                    autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
-                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
-                                    dataReserva.setText(dataAmbFormatString);
-                                    isbn = reserva.split(SEPARADOR)[3].toString();
-                                    try {
-                                        Thread.sleep(200);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    for (int i = 0; i < llistaLlibres.size(); i++) {
-                                        if (llistaLlibres.get(i).getISBN().equals(isbn)) {
-                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
-                                        }
-                                    }
-                                    // String amb l'imatge en base64
-                                    final String base64StringImage = imatgeString;
-                                    Bitmap decodedByte = null;
-                                    try {
-                                        // Decodifica l'imatge
-                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
-                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    final Bitmap finalDecodedByte = decodedByte;
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            thumbnailReserva.setImageBitmap(finalDecodedByte);
-                                            if (!base64StringImage.equals("")) {
-                                                thumbnailReserva.setBackground(null);
-                                            }
-                                        }
-                                    });
-                                }
-                                contReserves++;
-                            }
-                        }
-                        final int finalCont = contReserves;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (finalCont == 1) {
-                                    titleReserva1.setVisibility(View.VISIBLE);
-                                    autorReserva1.setVisibility(View.VISIBLE);
-                                    dataReserva1.setVisibility(View.VISIBLE);
-                                    dataReservaLabel1.setVisibility(View.VISIBLE);
-                                    btnEditaReserva1.setVisibility(View.VISIBLE);
-                                    btnAnulaReserva1.setVisibility(View.VISIBLE);
-                                    thumbnailReserva1.setVisibility(View.VISIBLE);
-                                    llocHoraLabel1.setVisibility(View.VISIBLE);
-                                    llocHora1.setVisibility(View.VISIBLE);
-                                    titleReserva.setVisibility(View.GONE);
-                                    autorReserva.setVisibility(View.GONE);
-                                    dataReserva.setVisibility(View.GONE);
-                                    dataReservaLabel.setVisibility(View.GONE);
-                                    btnEditaReserva.setVisibility(View.GONE);
-                                    btnAnulaReserva.setVisibility(View.GONE);
-                                    thumbnailReserva.setVisibility(View.GONE);
-                                    llocHoraLabel.setVisibility(View.GONE);
-                                    llocHora.setVisibility(View.GONE);
-                                } else if (finalCont == 2) {
-                                    titleReserva.setVisibility(View.VISIBLE);
-                                    autorReserva.setVisibility(View.VISIBLE);
-                                    dataReserva.setVisibility(View.VISIBLE);
-                                    dataReservaLabel.setVisibility(View.VISIBLE);
-                                    thumbnailReserva.setVisibility(View.VISIBLE);
-                                    btnAnulaReserva.setVisibility(View.VISIBLE);
-                                    btnEditaReserva.setVisibility(View.VISIBLE);
-                                    llocHoraLabel.setVisibility(View.VISIBLE);
-                                    llocHora.setVisibility(View.VISIBLE);
-                                    titleReserva1.setVisibility(View.VISIBLE);
-                                    autorReserva1.setVisibility(View.VISIBLE);
-                                    dataReserva1.setVisibility(View.VISIBLE);
-                                    dataReservaLabel1.setVisibility(View.VISIBLE);
-                                    thumbnailReserva1.setVisibility(View.VISIBLE);
-                                    btnAnulaReserva1.setVisibility(View.VISIBLE);
-                                    btnEditaReserva1.setVisibility(View.VISIBLE);
-                                    llocHoraLabel1.setVisibility(View.VISIBLE);
-                                    llocHora1.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showToast("No hi ha reserves...");
-                            }
-                        });
-                    }
-
-
-                    resposta = connexioServidor.consulta(codiRequestXifrat);
-                } else {
-                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-        thread.start();
+        // Mostra la llista de reserves
+        mostraLlistaReserves();
     }
 
     /**
@@ -609,63 +374,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                     }
                     resposta = connexioServidor.consulta(codiRequestXifrat);
 
-                    Thread thread = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-                            String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
-                            String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
-                            String codiRequestXifrat = "";
-                            ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
-                            try {
-                                codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
-                            } catch (Exception ex) {
-                                System.err.println("Error al encriptar: " + ex);
-                            }
-                            String resposta = connexioServidor.consulta(codiRequestXifrat);
-                            if (resposta.equals("OK")) {
-                                String getReserves = "getReservations";
-                                try {
-                                    codiRequestXifrat = encriptaDades(getReserves, (SecretKeySpec) sKey, ALGORISME);
-                                    llistaReserves = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
-                                } catch (Exception ex) {
-                                    System.err.println("Error al desencriptar: " + ex);
-                                }
-                                if (!llistaReserves.isEmpty()) {
-                                    // Obtenim les dades de cada reserva
-                                    String[] reserves = llistaReserves.split("~");
-                                    contReserves2 = 0;
-                                    for (String reserva : reserves) {
-                                        if (reserva.split(SEPARADOR)[0].equals(extras.split(SEPARADOR)[0])) {
-                                            if (contReserves2 == 0) {
-                                                titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
-                                                autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
-                                                isbn1 = reserva.split(SEPARADOR)[3].toString();
-                                                String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
-                                                dataReserva1.setText(dataAmbFormatString);
-                                            } else if (contReserves2 == 1) {
-                                                titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
-                                                autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
-                                                String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
-                                                dataReserva.setText(dataAmbFormatString);
-                                                isbn = reserva.split(SEPARADOR)[3].toString();
-                                            }
-                                            contReserves2++;
-                                        }
-                                    }
-
-                                }
-
-                                resposta = connexioServidor.consulta(codiRequestXifrat);
-                            } else {
-                                Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-                    });
-                    thread.start();
-
 
                 } else {
                     Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
@@ -673,6 +381,15 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
             }
         });
         thread.start();
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Mostra la llista de reserves
+        mostraLlistaReserves();
 
 
     }
@@ -733,6 +450,252 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         }
 
         return teReserves;
+    }
+
+
+    public void mostraLlistaReserves() {
+        if (!teReserves()) {
+            showToast("No hi ha reserves...");
+        }
+
+        // Preparem la font de les dades
+        llistaLlibres = new ArrayList<Llibre>();
+
+        // Executem la tasca per carregar els llibres
+        new CarregaLlibres().execute((Void) null);
+
+        contReserves = 0;
+
+        imatgeReserves = ((ImageView) findViewById(R.id.imageReserves));
+        imatgeReserves.setColorFilter(Color.GRAY);
+        thumbnailReserva1 = ((ImageView) findViewById(R.id.thumbnailReserva1));
+        titleReserva1 = ((TextView) findViewById(R.id.titleReserva1));
+        autorReserva1 = ((TextView) findViewById(R.id.autorReserva1));
+        dataReserva1 = ((TextView) findViewById(R.id.dataReserva1));
+        dataReservaLabel1 = ((TextView) findViewById(R.id.dataReservaLabel1));
+        llocHoraLabel1 = ((TextView) findViewById(R.id.llocHoraLabel1));
+        llocHora1 = ((TextView) findViewById(R.id.llocHora1));
+        thumbnailReserva = ((ImageView) findViewById(R.id.thumbnailReserva));
+        titleReserva = ((TextView) findViewById(R.id.titleReserva));
+        autorReserva = ((TextView) findViewById(R.id.autorReserva));
+        dataReserva = ((TextView) findViewById(R.id.dataReserva));
+        dataReservaLabel = ((TextView) findViewById(R.id.dataReservaLabel));
+        llocHoraLabel = ((TextView) findViewById(R.id.llocHoraLabel));
+        llocHora = ((TextView) findViewById(R.id.llocHora));
+        // Definim els listeners
+        btnTornarReserves = ((Button) findViewById(R.id.btnTornarReserves));
+        btnTornarReserves.setOnClickListener(this);
+        btnEditaReserva1 = (ImageButton) findViewById(R.id.buttonEditarReserva1);
+        btnEditaReserva1.setOnClickListener(this);
+        btnAnulaReserva1 = (ImageButton) findViewById(R.id.buttonAnularReserva1);
+        btnAnulaReserva1.setOnClickListener(this);
+        btnEditaReserva = (ImageButton) findViewById(R.id.buttonEditarReserva);
+        btnEditaReserva.setOnClickListener(this);
+        btnAnulaReserva = (ImageButton) findViewById(R.id.buttonAnularReserva);
+        btnAnulaReserva.setOnClickListener(this);
+
+
+        // Inicialment ocultem totes les reserves
+        thumbnailReserva.setVisibility(View.GONE);
+        titleReserva.setVisibility(View.GONE);
+        autorReserva.setVisibility(View.GONE);
+        dataReserva.setVisibility(View.GONE);
+        dataReservaLabel.setVisibility(View.GONE);
+        btnEditaReserva.setVisibility(View.GONE);
+        btnAnulaReserva.setVisibility(View.GONE);
+        llocHoraLabel.setVisibility(View.GONE);
+        llocHora.setVisibility(View.GONE);
+        thumbnailReserva1.setVisibility(View.GONE);
+        titleReserva1.setVisibility(View.GONE);
+        autorReserva1.setVisibility(View.GONE);
+        dataReserva1.setVisibility(View.GONE);
+        dataReservaLabel1.setVisibility(View.GONE);
+        btnEditaReserva1.setVisibility(View.GONE);
+        btnAnulaReserva1.setVisibility(View.GONE);
+        llocHoraLabel1.setVisibility(View.GONE);
+        llocHora1.setVisibility(View.GONE);
+
+        // Crea un intent amb la pantalla de login
+        i = new Intent(Reserves.this, PrincipalActivity.class);
+
+
+        // Mostra la llista de reserves de l'usuari
+        final Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String getReserves = "getReservations";
+                    try {
+                        codiRequestXifrat = encriptaDades(getReserves, (SecretKeySpec) sKey, ALGORISME);
+                        llistaReserves = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al desencriptar: " + ex);
+                    }
+                    if (!llistaReserves.isEmpty()) {
+                        // Obtenim la llista de llibres
+                        ArrayList<String> ar1 = getIntent().getExtras().getStringArrayList("LlistaLlibres");
+                        // String amb l'imatge de portada
+                        String imatgeString="";
+                        // Obtenim les dades de cada reserva
+                        String[] reserves = llistaReserves.split("~");
+                        for (String reserva : reserves) {
+                            if (reserva.split(SEPARADOR)[0].equals(extras.split(SEPARADOR)[0])) {
+                                if (contReserves == 0) {
+                                    titleReserva1.setText(reserva.split(SEPARADOR)[1].toString());
+                                    autorReserva1.setText(reserva.split(SEPARADOR)[2].toString());
+                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                    dataReserva1.setText(dataAmbFormatString);
+                                    isbn1 = reserva.split(SEPARADOR)[3].toString();
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    for (int i = 0; i < llistaLlibres.size(); i++) {
+                                        if (llistaLlibres.get(i).getISBN().equals(isbn1)) {
+                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
+                                        }
+                                    }
+                                    // String amb l'imatge en base64
+                                    final String base64StringImage = imatgeString;
+                                    Bitmap decodedByte = null;
+                                    try {
+                                        // Decodifica l'imatge
+                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    final Bitmap finalDecodedByte = decodedByte;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            thumbnailReserva1.setImageBitmap(finalDecodedByte);
+                                            if (base64StringImage.equals("")) {
+                                                thumbnailReserva1.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+                                            }
+                                        }
+                                    });
+                                } else if (contReserves == 1) {
+                                    titleReserva.setText(reserva.split(SEPARADOR)[1].toString());
+                                    autorReserva.setText(reserva.split(SEPARADOR)[2].toString());
+                                    String dataAmbFormatString = dataAmbFormat(reserva.split(SEPARADOR)[4].toString());
+                                    dataReserva.setText(dataAmbFormatString);
+                                    isbn = reserva.split(SEPARADOR)[3].toString();
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    for (int i = 0; i < llistaLlibres.size(); i++) {
+                                        if (llistaLlibres.get(i).getISBN().equals(isbn)) {
+                                            imatgeString = llistaLlibres.get(i).getImatgePortada().split(SEPARADOR_IMATGE)[0];
+                                        }
+                                    }
+                                    // String amb l'imatge en base64
+                                    final String base64StringImage = imatgeString;
+                                    Bitmap decodedByte = null;
+                                    try {
+                                        // Decodifica l'imatge
+                                        byte[] decodedString = Base64.decode(base64StringImage, Base64.DEFAULT);
+                                        decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    final Bitmap finalDecodedByte = decodedByte;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            thumbnailReserva.setImageBitmap(finalDecodedByte);
+                                            if (base64StringImage.equals("")) {
+                                                thumbnailReserva.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+                                            }
+                                        }
+                                    });
+                                }
+                                contReserves++;
+                            }
+                        }
+                        final int finalCont = contReserves;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (finalCont == 1) {
+                                    titleReserva1.setVisibility(View.VISIBLE);
+                                    autorReserva1.setVisibility(View.VISIBLE);
+                                    dataReserva1.setVisibility(View.VISIBLE);
+                                    dataReservaLabel1.setVisibility(View.VISIBLE);
+                                    btnEditaReserva1.setVisibility(View.VISIBLE);
+                                    btnAnulaReserva1.setVisibility(View.VISIBLE);
+                                    thumbnailReserva1.setVisibility(View.VISIBLE);
+                                    llocHoraLabel1.setVisibility(View.VISIBLE);
+                                    llocHora1.setVisibility(View.VISIBLE);
+                                    titleReserva.setVisibility(View.GONE);
+                                    autorReserva.setVisibility(View.GONE);
+                                    dataReserva.setVisibility(View.GONE);
+                                    dataReservaLabel.setVisibility(View.GONE);
+                                    btnEditaReserva.setVisibility(View.GONE);
+                                    btnAnulaReserva.setVisibility(View.GONE);
+                                    thumbnailReserva.setVisibility(View.GONE);
+                                    llocHoraLabel.setVisibility(View.GONE);
+                                    llocHora.setVisibility(View.GONE);
+                                } else if (finalCont == 2) {
+                                    titleReserva.setVisibility(View.VISIBLE);
+                                    autorReserva.setVisibility(View.VISIBLE);
+                                    dataReserva.setVisibility(View.VISIBLE);
+                                    dataReservaLabel.setVisibility(View.VISIBLE);
+                                    thumbnailReserva.setVisibility(View.VISIBLE);
+                                    btnAnulaReserva.setVisibility(View.VISIBLE);
+                                    btnEditaReserva.setVisibility(View.VISIBLE);
+                                    llocHoraLabel.setVisibility(View.VISIBLE);
+                                    llocHora.setVisibility(View.VISIBLE);
+                                    titleReserva1.setVisibility(View.VISIBLE);
+                                    autorReserva1.setVisibility(View.VISIBLE);
+                                    dataReserva1.setVisibility(View.VISIBLE);
+                                    dataReservaLabel1.setVisibility(View.VISIBLE);
+                                    thumbnailReserva1.setVisibility(View.VISIBLE);
+                                    btnAnulaReserva1.setVisibility(View.VISIBLE);
+                                    btnEditaReserva1.setVisibility(View.VISIBLE);
+                                    llocHoraLabel1.setVisibility(View.VISIBLE);
+                                    llocHora1.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showToast("No hi ha reserves...");
+                            }
+                        });
+                    }
+
+
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
