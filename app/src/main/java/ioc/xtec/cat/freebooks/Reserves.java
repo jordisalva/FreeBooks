@@ -188,7 +188,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     dataReserva1.setText(dataAmbFormatString);
                                     isbn1 = reserva.split(SEPARADOR)[3].toString();
                                     try {
-                                        Thread.sleep(100);
+                                        Thread.sleep(200);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -224,7 +224,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     dataReserva.setText(dataAmbFormatString);
                                     isbn = reserva.split(SEPARADOR)[3].toString();
                                     try {
-                                        Thread.sleep(100);
+                                        Thread.sleep(200);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }

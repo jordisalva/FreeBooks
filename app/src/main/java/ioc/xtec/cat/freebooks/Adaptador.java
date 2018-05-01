@@ -240,8 +240,15 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                     e.printStackTrace();
                 }
 
-                if (reservesUser >= 2) {
-                    Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
+
+                if (reservesUser >= 2 || llibreJaReservat(items.get(position).getISBN())) {
+                    if (reservesUser >=2) {
+                        Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
+                    }
+
+                    if(llibreJaReservat(items.get(position).getISBN())) {
+                        Toast.makeText(context, "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     // Crea un missatge d'alerta
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -386,6 +393,64 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             i.putExtra(EXTRA_MESSAGE, extrasMessage);
             context.startActivity(i);
         }
+    }
+
+    /**
+     * Verifica si l'usuari actual ja ha reservat un llibre amb el mateix ISBN
+     *
+     * @return boleà per verificar si existeixen reserves per l'usuari actual amb el mateix ISBN
+     */
+    public boolean llibreJaReservat(final String ISBN) {
+        final int[] reservesUser = new int[1];
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(context);
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                String reservesUserString = "";
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String reservationsUserAndIsbn = "getReservationsPerUserAndIsbn" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + ISBN;
+
+                    try {
+                        codiRequestXifrat = encriptaDades(reservationsUserAndIsbn, (SecretKeySpec) sKey, ALGORISME);
+                        try {
+                            reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al desencriptar: " + ex);
+                        }
+                        reservesUser[0] = Integer.parseInt(reservesUserString);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(context, "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean teReserves = false;
+        if (reservesUser[0] > 0) {
+            teReserves = true;
+        }
+
+        return teReserves;
     }
 
     /**
