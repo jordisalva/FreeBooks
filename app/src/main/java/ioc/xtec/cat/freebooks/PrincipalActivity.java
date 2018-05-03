@@ -128,8 +128,10 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         bookingsMenuItem = menu.findItem(R.id.app_bookings);
+        // En cas que tingui reserves pinta l'icona d'accés a la llista de reserves de color verd
         if (teReserves()) {
             bookingsMenuItem.getIcon().setTint(Color.GREEN);
+            // En cas que no pinta l'icona d'accés a la llista de reserves de color blanc
         } else {
             bookingsMenuItem.getIcon().setTint(Color.WHITE);
         }
@@ -449,7 +451,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
      *
      * @return boleà per verificar si existeixen reserves per l'usuari actual
      */
-    public boolean teReserves () {
+    public boolean teReserves() {
         final int[] reservesUser = new int[1];
         Thread thread = new Thread(new Runnable() {
 
@@ -496,7 +498,7 @@ public class PrincipalActivity extends AppCompatActivity implements View.OnClick
         }
         boolean teReserves = false;
         if (reservesUser[0] > 0) {
-         teReserves = true;
+            teReserves = true;
         }
 
         return teReserves;

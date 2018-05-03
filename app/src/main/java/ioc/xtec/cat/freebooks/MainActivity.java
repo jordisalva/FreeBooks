@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    //showToast("S'han donat els permisos");
 
                     // Definim els listeners
                     botoInici = ((Button) findViewById(R.id.buttonIniciarSessio));
@@ -106,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override
     public void onClick(View v) {
-
         //  Mirem en quin botó ha fet click l'usuari
         if (v == botoInici) {
             // Crida per iniciar la sessió
@@ -118,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == botoSortir) {
             finish();
         }
-
     }
 
     /**
@@ -133,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final String passIntroduit = textContrasenya.getText().toString();
 
         final String codiRequest = "userLogin" + SEPARADOR + usuariIntroduit + SEPARADOR + passIntroduit + SEPARADOR + "Mobile";
-
 
         final Thread thread = new Thread(new Runnable() {
 

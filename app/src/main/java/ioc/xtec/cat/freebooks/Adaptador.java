@@ -133,11 +133,10 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
         // Si hi ha imatge carrega l'imatge
         if (decodedByte != null) {
-            viewHolder.vThumbnail.setBackground(null);
             viewHolder.vThumbnail.setImageBitmap(decodedByte);
             // Si no hi ha imatge carrega una imatge per defecte
         } else {
-            viewHolder.vThumbnail.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+            viewHolder.vThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
             viewHolder.vThumbnail.getLayoutParams().height = 250;
             viewHolder.vThumbnail.getLayoutParams().width = 250;
             RelativeLayout.LayoutParams layoutarams = (RelativeLayout.LayoutParams) viewHolder.vThumbnail.getLayoutParams();
@@ -173,22 +172,6 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
         });
 
         /**
-         * De moment no s'utilitza
-         //Al fer un click llarg sobre un llibre
-         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-        @Override public boolean onLongClick(View v) {
-        //Borrem el llibre de la llista visualitzada(no de les dades guardades)
-        items.remove(position);
-        //Notifiquem el canvi
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, items.size());
-        return true;
-        }
-        });
-         **/
-
-
-        /**
          * Creem un missatge de confirmació de la reserva
          */
 
@@ -200,6 +183,7 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
                     @Override
                     public void run() {
+                        // Verifica si l'usuari està logat
                         SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
                         String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
                         String codiRequestXifrat = "";
@@ -212,10 +196,12 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                             System.err.println("Error al encriptar: " + ex);
                         }
 
+                        // Fa la crida al servidor amb al consulta de si l'usuari està logat
                         String resposta = connexioServidor.consulta(codiRequestXifrat);
+
+                        // En cas que si estigui logat, guarda a reservesUser les reserves que ha realitzat l'usuari
                         if (resposta.equals("OK")) {
                             String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
-
                             try {
                                 codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
                                 try {
@@ -241,12 +227,14 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                 }
 
 
+                // En cas que passi de les 2 reserves, mostra un missatge a l'usuari informant-lo
                 if (reservesUser >= 2 || llibreJaReservat(items.get(position).getISBN())) {
-                    if (reservesUser >=2) {
+                    if (reservesUser >= 2) {
                         Toast.makeText(context, "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
                     }
 
-                    if(llibreJaReservat(items.get(position).getISBN())) {
+                    // En cas que el llibre ja hagi estat reservat, mostra un missatge a l'usuari informant-lo
+                    if (llibreJaReservat(items.get(position).getISBN())) {
                         Toast.makeText(context, "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -273,14 +261,13 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
                                     datePickerDialog = new DatePickerDialog(
                                             context, Adaptador.this, anyInici, mesInici, diaInici);
                                     long now = System.currentTimeMillis() - 1000;
+                                    // Defineix una data mínima
                                     datePickerDialog.getDatePicker().setMinDate(now);
-                                    datePickerDialog.getDatePicker().setMaxDate(now+(1000*60*60*24*21));
+                                    // Defineix una dat màxima
+                                    datePickerDialog.getDatePicker().setMaxDate(now + (1000 * 60 * 60 * 24 * 21));
                                     datePickerDialog.setTitle("Indica la data de reserva");
                                     // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
                                     datePickerDialog.show();
-                                    //viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
-                                    //viewHolder.vtext.setText("Reservat!");
-                                    //viewHolder.vButton.setVisibility(View.GONE);
                                 }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -333,36 +320,36 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
 
     /**
      * @param view amb la vista
-     * @param any amb l'any de la reserva
-     * @param mes amb el mes de la reserva
-     * @param dia amb el dia de la reserva
+     * @param any  amb l'any de la reserva
+     * @param mes  amb el mes de la reserva
+     * @param dia  amb el dia de la reserva
      */
     @Override
     public void onDateSet(DatePicker view, int any, int mes, int dia) {
         mes = mes + 1;
-        final String dataReserva = any+"-"+mes+"-"+dia;
+        final String dataReserva = any + "-" + mes + "-" + dia;
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
+                // Verifica si l'usuari està logat
                 SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
                 String extras = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
                 String codiRequestXifrat = "";
                 ConnexioServidor connexioServidor = new ConnexioServidor(context);
                 String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
-                int reservesUser;
                 try {
                     codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                 } catch (Exception ex) {
                     System.err.println("Error al encriptar: " + ex);
                 }
 
+                // Fa la crida al servidor amb al consulta de si l'usuari està logat
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
+
+                // En cas que si estigui logat, guarda la reserva
                 if (resposta.equals("OK")) {
-                    //String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
-
-                    String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN()+ SEPARADOR + dataReserva;
-
+                    String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + items.get(posicioReserva).getISBN() + SEPARADOR + dataReserva;
                     try {
                         codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
                     } catch (Exception ex) {
@@ -382,13 +369,17 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ElMeuViewHolder> i
             e.printStackTrace();
         }
 
+        // Si no s'ha pogut fer la reserva, s'informarà a l'usuari
         if (errorReserva.equals("FAILNOTUNIQUE")) {
             Toast.makeText(context, "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
+
+            // Si s'ha fet la reserva, s'informa a l'usuari i accedeix a la pantalla de reserves
         } else if (errorReserva.equals("OK")) {
             Toast.makeText(context, "Has reservat el llibre: \n" + items.get(posicioReserva).getTitol(), Toast.LENGTH_SHORT).show();
             Toast.makeText(context, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
-            // Crea un intent amb la pantalla de reserves
+            // Al finalitzar la reserva et porta a la pantalla de reserves
             String extrasMessage = ((Activity) context).getIntent().getStringExtra(EXTRA_MESSAGE);
+            // Crea un intent amb la pantalla de reserves
             Intent i = new Intent(context, Reserves.class);
             i.putExtra(EXTRA_MESSAGE, extrasMessage);
             context.startActivity(i);

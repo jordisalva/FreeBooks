@@ -20,6 +20,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+
 import javax.net.ssl.SSLSocket;
 
 /**
@@ -58,13 +59,10 @@ public class ConnexioServidor {
         port = 9999;
         ip_address = "10.0.2.2";
         try {
-
             KeyStore ks = KeyStore.getInstance("BKS");
             InputStream keyin = context.getResources().openRawResource(R.raw.testserverkeys);
             ks.load(keyin, keystorepass);
             final SSLSocketFactory socketFactory = new SSLSocketFactory(ks);
-            //socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
             try {
                 socket = (SSLSocket) socketFactory.createSocket();
                 try {
@@ -83,7 +81,6 @@ public class ConnexioServidor {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } catch (UnknownHostException e) {
             Toast.makeText(context, "Host desconegut", Toast.LENGTH_SHORT).show();
             Log.i(TAG, "host desconegut");

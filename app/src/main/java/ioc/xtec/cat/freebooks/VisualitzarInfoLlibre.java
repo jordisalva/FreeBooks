@@ -25,6 +25,7 @@ import java.util.Calendar;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static ioc.xtec.cat.freebooks.CriptoUtils.desencriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.encriptaDades;
 import static ioc.xtec.cat.freebooks.CriptoUtils.passwordKeyGeneration;
 
@@ -57,6 +58,8 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
 
     private int anyInici, mesInici, diaInici;
     private DatePickerDialog datePickerDialog;
+    private int reservesUser;
+    private String errorReserva;
 
     /**
      * Accions en la creació
@@ -93,11 +96,11 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         // Si hi ha imatge carrega l'imatge
         if (decodedByte != null) {
-            imatgeLlibre.setBackground(null);
+            //imatgeLlibre.setBackground(null);
             imatgeLlibre.setImageBitmap(decodedByte);
             // Si no hi ha imatge carrega una imatge per defecte
         } else {
-            imatgeLlibre.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+            imatgeLlibre.setImageResource(android.R.drawable.ic_menu_report_image);
         }
         textEditorIAny.setText(bundle.getString("EditorIAny"));
         textNumPagines.setText(bundle.getString("NumPagines"));
@@ -126,50 +129,108 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
         if (v == btnReserva) {
-            //showToast("Has reservat el llibre: \n" + textTitol.getText());
-            // Crea un missatge d'alerta
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                    VisualitzarInfoLlibre.this);
+            Thread thread = new Thread(new Runnable() {
 
-            // Títol del missatge d'alerta
-            alertDialogBuilder.setTitle("Reservar: ");
+                @Override
+                public void run() {
+                    SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                    String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                    String codiRequestXifrat = "";
+                    ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                    String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                    String reservesUserString = "";
+                    try {
+                        codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
 
-            // Defineix el missatge de l'alerta
-            alertDialogBuilder
-                    .setMessage("Vols reservar el llibre: " +
-                            textTitol.getText() + "? \n\n" +
-                            "Al fer click a \"Sí\" hauras de triar el dia que vols recollir el llibre")
-                    .setCancelable(false)
-                    .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //posicioReserva = position;
-                            final Calendar c = Calendar.getInstance();
-                            anyInici = c.get(Calendar.YEAR);
-                            mesInici = c.get(Calendar.MONTH);
-                            diaInici = c.get(Calendar.DAY_OF_MONTH);
-                            datePickerDialog = new DatePickerDialog(
-                                    VisualitzarInfoLlibre.this, VisualitzarInfoLlibre.this, anyInici, mesInici, diaInici);
-                            long now = System.currentTimeMillis() - 1000;
-                            datePickerDialog.getDatePicker().setMinDate(now);
-                            datePickerDialog.setTitle("Indica la data de reserva");
-                            // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
-                            datePickerDialog.show();
-                            //viewHolder.itemView.setBackgroundColor(Color.parseColor("green"));
-                            //viewHolder.vtext.setText("Reservat!");
-                            //viewHolder.vButton.setVisibility(View.GONE);
+                    // Fa la crida al servidor amb al consulta de si l'usuari està logat
+                    String resposta = connexioServidor.consulta(codiRequestXifrat);
+
+                    // En cas que si estigui logat, guarda a reservesUser les reserves que ha realitzat l'usuari
+                    if (resposta.equals("OK")) {
+                        String reservationsUser = "getReservationsPerUser" + SEPARADOR + extras.split(SEPARADOR)[0];
+
+                        try {
+                            codiRequestXifrat = encriptaDades(reservationsUser, (SecretKeySpec) sKey, ALGORISME);
+                            try {
+                                reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                            } catch (Exception ex) {
+                                System.err.println("Error al desencriptar: " + ex);
+                            }
+                            reservesUser = Integer.parseInt(reservesUserString);
+                        } catch (Exception ex) {
+                            System.err.println("Error al encriptar: " + ex);
                         }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
+                        resposta = connexioServidor.consulta(codiRequestXifrat);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            // Crea un missatge d'alerta
-            AlertDialog alertDialog = alertDialogBuilder.create();
 
-            // Mostra el missatge d'alerta
-            alertDialog.show();
+            // En cas que passi de les 2 reserves, mostra un missatge a l'usuari informant-lo
+            if (reservesUser >= 2 || llibreJaReservat(textISBN.getText().toString())) {
+                if (reservesUser >= 2) {
+                    Toast.makeText(getApplicationContext(), "Has assolit el màxim de reserves simultànies permeses per usuari, que és 2...", Toast.LENGTH_SHORT).show();
+                }
+
+                // En cas que el llibre ja hagi estat reservat, mostra un missatge a l'usuari informant-lo
+                if (llibreJaReservat(textISBN.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // Crea un missatge d'alerta
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        VisualitzarInfoLlibre.this);
+
+                // Títol del missatge d'alerta
+                alertDialogBuilder.setTitle("Reservar: ");
+
+                // Defineix el missatge de l'alerta
+                alertDialogBuilder
+                        .setMessage("Vols reservar el llibre: " +
+                                textTitol.getText().toString() + "? \n\n" +
+                                "Al fer click a \"Sí\" hauras de triar el dia que vols recollir el llibre")
+                        .setCancelable(false)
+                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                final Calendar c = Calendar.getInstance();
+                                anyInici = c.get(Calendar.YEAR);
+                                mesInici = c.get(Calendar.MONTH);
+                                diaInici = c.get(Calendar.DAY_OF_MONTH);
+                                datePickerDialog = new DatePickerDialog(
+                                        VisualitzarInfoLlibre.this, VisualitzarInfoLlibre.this, anyInici, mesInici, diaInici);
+                                long now = System.currentTimeMillis() - 1000;
+                                // Defineix una data mínima
+                                datePickerDialog.getDatePicker().setMinDate(now);
+                                // Defineix una dat màxima
+                                datePickerDialog.getDatePicker().setMaxDate(now + (1000 * 60 * 60 * 24 * 21));
+                                datePickerDialog.setTitle("Indica la data de reserva");
+                                // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
+                                datePickerDialog.show();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                // Crea un missatge d'alerta
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // Mostra el missatge d'alerta
+                alertDialog.show();
+            }
         } else if (v == btnTornar) {
             String extra = getIntent().getStringExtra(EXTRA_MESSAGE);
             i.putExtra(EXTRA_MESSAGE, extra);
@@ -205,41 +266,132 @@ public class VisualitzarInfoLlibre extends AppCompatActivity implements View.OnC
         finish();
     }
 
+    /**
+     * @param view amb la vista
+     * @param any  amb l'any de la reserva
+     * @param mes  amb el mes de la reserva
+     * @param dia  amb el dia de la reserva
+     */
     @Override
     public void onDateSet(DatePicker view, int any, int mes, int dia) {
         mes = mes + 1;
-        Toast.makeText(VisualitzarInfoLlibre.this, "Has reservat el llibre: \n" + textTitol.getText(), Toast.LENGTH_SHORT).show();
-        Toast.makeText(VisualitzarInfoLlibre.this, "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
+        final String dataReserva = any + "-" + mes + "-" + dia;
+        Thread thread = new Thread(new Runnable() {
 
-        // Nova reserva
-        final String dataReserva = any+"-"+mes+"-"+dia;
+            @Override
+            public void run() {
+                // Verifica si l'usuari està logat
+                SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
+                String codiRequestXifrat = "";
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                try {
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
+                } catch (Exception ex) {
+                    System.err.println("Error al encriptar: " + ex);
+                }
+
+                // Fa la crida al servidor amb al consulta de si l'usuari està logat
+                String resposta = connexioServidor.consulta(codiRequestXifrat);
+
+                // En cas que si estigui logat, guarda la reserva
+                if (resposta.equals("OK")) {
+                    String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + textISBN.getText().toString() + SEPARADOR + dataReserva;
+                    try {
+                        codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    errorReserva = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Si no s'ha pogut fer la reserva, s'informarà a l'usuari
+        if (errorReserva.equals("FAILNOTUNIQUE")) {
+            Toast.makeText(getApplicationContext(), "No pots reservar el mateix llibre dos cops...", Toast.LENGTH_SHORT).show();
+
+            // Si s'ha fet la reserva, s'informa a l'usuari i accedeix a la pantalla de reserves
+        } else if (errorReserva.equals("OK")) {
+            Toast.makeText(getApplicationContext(), "Has reservat el llibre: \n" + textTitol.getText().toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Data de recollida seleccionada: \n" + dia + "/" + mes + "/" + any, Toast.LENGTH_SHORT).show();
+            // Al finalitzar la reserva et porta a la pantalla de reserves
+            String extrasMessage = ((Activity) VisualitzarInfoLlibre.this).getIntent().getStringExtra(EXTRA_MESSAGE);
+            // Crea un intent amb la pantalla de reserves
+            Intent i = new Intent(VisualitzarInfoLlibre.this, Reserves.class);
+            i.putExtra(EXTRA_MESSAGE, extrasMessage);
+            i.putExtra("Inici", "noinici");
+            VisualitzarInfoLlibre.this.startActivity(i);
+            finish();
+        }
+
+    }
+
+    /**
+     * Verifica si l'usuari actual ja ha reservat un llibre amb el mateix ISBN
+     *
+     * @return boleà per verificar si existeixen reserves per l'usuari actual amb el mateix ISBN
+     */
+    public boolean llibreJaReservat(final String ISBN) {
+        final int[] reservesUser = new int[1];
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
-                String extras = ((Activity) VisualitzarInfoLlibre.this).getIntent().getStringExtra(EXTRA_MESSAGE);
+                String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
                 String codiRequestXifrat = "";
-                String insertReservation = "novaReserva" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + textISBN.getText() + SEPARADOR + dataReserva;
+                ConnexioServidor connexioServidor = new ConnexioServidor(getApplicationContext());
+                String checkLogin = "userIsLogged" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + extras.split(SEPARADOR)[1];
+                String reservesUserString = "";
                 try {
-                    codiRequestXifrat = encriptaDades(insertReservation, (SecretKeySpec) sKey, ALGORISME);
+                    codiRequestXifrat = encriptaDades(checkLogin, (SecretKeySpec) sKey, ALGORISME);
                 } catch (Exception ex) {
                     System.err.println("Error al encriptar: " + ex);
                 }
-                ConnexioServidor connexioServidor = new ConnexioServidor(VisualitzarInfoLlibre.this);
-                // Crida al servidor per guardar la reserva
+
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
+                if (resposta.equals("OK")) {
+                    String reservationsUserAndIsbn = "getReservationsPerUserAndIsbn" + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + ISBN;
+
+                    try {
+                        codiRequestXifrat = encriptaDades(reservationsUserAndIsbn, (SecretKeySpec) sKey, ALGORISME);
+                        try {
+                            reservesUserString = desencriptaDades(connexioServidor.consulta(codiRequestXifrat), (SecretKeySpec) sKey, ALGORISME);
+                        } catch (Exception ex) {
+                            System.err.println("Error al desencriptar: " + ex);
+                        }
+                        reservesUser[0] = Integer.parseInt(reservesUserString);
+                    } catch (Exception ex) {
+                        System.err.println("Error al encriptar: " + ex);
+                    }
+                    resposta = connexioServidor.consulta(codiRequestXifrat);
+                } else {
+                    Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean teReserves = false;
+        if (reservesUser[0] > 0) {
+            teReserves = true;
+        }
 
-        // Al finalitzar la reserva et porta a la pantalla de reserves
-        // Crea un intent amb la pantalla de reserves
-        String extrasMessage = ((Activity) VisualitzarInfoLlibre.this).getIntent().getStringExtra(EXTRA_MESSAGE);
-        Intent i = new Intent(VisualitzarInfoLlibre.this, Reserves.class);
-        i.putExtra(EXTRA_MESSAGE, extrasMessage);
-        i.putExtra("Inici", "noinici");
-        VisualitzarInfoLlibre.this.startActivity(i);
-        finish();
+        return teReserves;
     }
 }

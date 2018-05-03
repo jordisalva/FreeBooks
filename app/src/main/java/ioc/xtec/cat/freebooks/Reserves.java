@@ -41,6 +41,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     // Variable amb l'intent
     Intent i;
 
+    // Resta de variables
     Button btnTornarReserves;
     ImageView imatgeReserves;
 
@@ -75,6 +76,11 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
     String modificatISBN;
 
+    /**
+     * Accions en la creació
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +100,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
      */
     @Override
     public void onClick(final View v) {
+        // Si es fa click sobre els botons d'editar reserva es guarda l'isbn corresponent a cacda un
         if (v == btnEditaReserva || v == btnEditaReserva1) {
             if (v == btnEditaReserva) {
                 modificatISBN = isbn;
@@ -108,12 +115,15 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
             datePickerDialog = new DatePickerDialog(
                     Reserves.this, Reserves.this, anyInici, mesInici, diaInici);
             long now = System.currentTimeMillis() - 1000;
+            // Defineix una data mínima
             datePickerDialog.getDatePicker().setMinDate(now);
+            // Defineix una dat màxima
             datePickerDialog.getDatePicker().setMaxDate(now + (1000 * 60 * 60 * 24 * 21));
             datePickerDialog.setTitle("Indica la data de reserva");
-            // Mostra un diàleg per seleccionar la data que es vol recollir el llibre
+            // Mostra un diàleg per seleccionar una nova data en que es vol recollir el llibre
             datePickerDialog.show();
 
+            // Si es fa click sobre els botons d'anul·lar la reserva es guarda el títol a esborrar
         } else if (v == btnAnulaReserva || v == btnAnulaReserva1) {
             String titolAEsborrar = "";
             if (v == btnAnulaReserva) {
@@ -140,6 +150,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                             if (v == btnAnulaReserva) {
                                 isbnABorrar = isbn;
 
+                                // S'amaguen tots elements de la vista d'aquesta reserva
                                 titleReserva.setVisibility(View.GONE);
                                 autorReserva.setVisibility(View.GONE);
                                 dataReserva.setVisibility(View.GONE);
@@ -154,6 +165,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                             } else if (v == btnAnulaReserva1) {
                                 isbnABorrar = isbn1;
 
+                                // S'amaguen tots elements de la vista d'aquesta reserva
                                 titleReserva1.setVisibility(View.GONE);
                                 autorReserva1.setVisibility(View.GONE);
                                 dataReserva1.setVisibility(View.GONE);
@@ -165,6 +177,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                 llocHora1.setVisibility(View.GONE);
                             }
 
+                            // S'anula la reserva
                             final String finalIsbnABorrar = isbnABorrar;
                             Thread thread = new Thread(new Runnable() {
 
@@ -335,6 +348,12 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         return dataAmbFormat;
     }
 
+    /**
+     * @param view amb la vista
+     * @param any  amb l'any de la reserva
+     * @param mes  amb el mes de la reserva
+     * @param dia  amb el dia de la reserva
+     */
     @Override
     public void onDateSet(DatePicker view, int any, int mes, int dia) {
         mes = mes + 1;
@@ -345,6 +364,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
             @Override
             public void run() {
+                // Verifica si l'usuari està logat
                 SecretKey sKey = passwordKeyGeneration("pass*12@", 128);
                 String extras = getIntent().getStringExtra(EXTRA_MESSAGE);
                 String codiRequestXifrat = "";
@@ -357,24 +377,23 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                     System.err.println("Error al encriptar: " + ex);
                 }
 
+                // Fa la crida al servidor amb al consulta de si l'usuari està logat
                 String resposta = connexioServidor.consulta(codiRequestXifrat);
-                if (resposta.equals("OK")) {
 
+                // En cas que si estigui logat, edita la reserva
+                if (resposta.equals("OK")) {
                     String editReservationDate = "editReservationDate" + SEPARADOR + dataReservaDataSet + SEPARADOR + extras.split(SEPARADOR)[0] + SEPARADOR + modificatISBN;
                     try {
                         codiRequestXifrat = encriptaDades(editReservationDate, (SecretKeySpec) sKey, ALGORISME);
                     } catch (Exception ex) {
                         System.err.println("Error al encriptar: " + ex);
                     }
-
                     try {
                         codiRequestXifrat = encriptaDades(editReservationDate, (SecretKeySpec) sKey, ALGORISME);
                     } catch (Exception ex) {
                         System.err.println("Error al encriptar: " + ex);
                     }
                     resposta = connexioServidor.consulta(codiRequestXifrat);
-
-
                 } else {
                     Toast.makeText(getApplicationContext(), "L'usuari no està logat...", Toast.LENGTH_SHORT).show();
                 }
@@ -390,7 +409,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
 
         // Mostra la llista de reserves
         mostraLlistaReserves();
-
 
     }
 
@@ -453,6 +471,9 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
     }
 
 
+    /**
+     * Mostra la llista de reserves
+     */
     public void mostraLlistaReserves() {
         if (!teReserves()) {
             showToast("No hi ha reserves...");
@@ -467,6 +488,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         contReserves = 0;
 
         imatgeReserves = ((ImageView) findViewById(R.id.imageReserves));
+        // Posem a gris l'icona de la reserva
         imatgeReserves.setColorFilter(Color.GRAY);
         thumbnailReserva1 = ((ImageView) findViewById(R.id.thumbnailReserva1));
         titleReserva1 = ((TextView) findViewById(R.id.titleReserva1));
@@ -482,6 +504,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
         dataReservaLabel = ((TextView) findViewById(R.id.dataReservaLabel));
         llocHoraLabel = ((TextView) findViewById(R.id.llocHoraLabel));
         llocHora = ((TextView) findViewById(R.id.llocHora));
+
         // Definim els listeners
         btnTornarReserves = ((Button) findViewById(R.id.btnTornarReserves));
         btnTornarReserves.setOnClickListener(this);
@@ -547,7 +570,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                         // Obtenim la llista de llibres
                         ArrayList<String> ar1 = getIntent().getExtras().getStringArrayList("LlistaLlibres");
                         // String amb l'imatge de portada
-                        String imatgeString="";
+                        String imatgeString = "";
                         // Obtenim les dades de cada reserva
                         String[] reserves = llistaReserves.split("~");
                         for (String reserva : reserves) {
@@ -584,7 +607,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                         public void run() {
                                             thumbnailReserva1.setImageBitmap(finalDecodedByte);
                                             if (base64StringImage.equals("")) {
-                                                thumbnailReserva1.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+                                                thumbnailReserva1.setImageResource(android.R.drawable.ic_menu_report_image);
                                             }
                                         }
                                     });
@@ -618,9 +641,10 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            //thumbnailReserva.setBackground(null);
                                             thumbnailReserva.setImageBitmap(finalDecodedByte);
                                             if (base64StringImage.equals("")) {
-                                                thumbnailReserva.setBackgroundResource(android.R.drawable.ic_menu_report_image);
+                                                thumbnailReserva.setImageResource(android.R.drawable.ic_menu_report_image);
                                             }
                                         }
                                     });
@@ -633,6 +657,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                             @Override
                             public void run() {
                                 if (finalCont == 1) {
+                                    // Mostra la primera reserva si n'hi ha
                                     titleReserva1.setVisibility(View.VISIBLE);
                                     autorReserva1.setVisibility(View.VISIBLE);
                                     dataReserva1.setVisibility(View.VISIBLE);
@@ -652,6 +677,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                                     llocHoraLabel.setVisibility(View.GONE);
                                     llocHora.setVisibility(View.GONE);
                                 } else if (finalCont == 2) {
+                                    // Mostra la segona reserva si n'hi ha
                                     titleReserva.setVisibility(View.VISIBLE);
                                     autorReserva.setVisibility(View.VISIBLE);
                                     dataReserva.setVisibility(View.VISIBLE);
@@ -681,7 +707,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                             }
                         });
                     }
-
 
                     resposta = connexioServidor.consulta(codiRequestXifrat);
                 } else {
@@ -750,17 +775,7 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                         } catch (Exception ex) {
                             System.err.println("Error al afegir llibre:  " + ex);
                         }
-
                     }
-
-                    // Va massa ràpid a carregar les imatges i no es veu la barra de progrés
-                    // Li afegim un segon de retard perqué és vegi sempre
-                    /**try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }**/
-
                 } else {
                     showToast("No hi ha llibres a la base de dades");
                 }
@@ -769,7 +784,6 @@ public class Reserves extends AppCompatActivity implements View.OnClickListener,
                 startActivity(i);
                 finish();
             }
-
             return null;
         }
 

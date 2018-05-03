@@ -43,7 +43,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="176dp"
         android:adjustViewBounds="false"
-        android:background="@android:drawable/ic_menu_gallery"
         android:contentDescription="@string/thumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -149,7 +148,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="332dp"
         android:adjustViewBounds="false"
-        android:background="@android:drawable/ic_menu_gallery"
         android:contentDescription="@string/thumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
